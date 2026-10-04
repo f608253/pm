@@ -1,46 +1,213 @@
-import { render, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { KanbanBoard } from "@/components/KanbanBoard";
+import type { Board } from "@/lib/kanban";
 
-const getFirstColumn = () => screen.getAllByTestId(/column-/i)[0];
+const board: Board = {
+  id: 1,
+  title: "My Board",
+  columns: [
+    {
+      id: 1,
+      title: "Backlog",
+      cards: [
+        { id: 1, title: "Align roadmap themes", details: "Draft themes." },
+        { id: 2, title: "Gather customer signals", details: "Review tags." },
+      ],
+    },
+    { id: 2, title: "Review", cards: [{ id: 3, title: "QA interactions", details: "" }] },
+  ],
+};
+
+type Handler = (url: string, init?: RequestInit) => { status: number; body?: unknown };
+
+const json = (status: number, body?: unknown) => ({
+  ok: status >= 200 && status < 300,
+  status,
+  json: () => Promise.resolve(body ?? null),
+});
+
+const calls: { url: string; method: string; body: unknown }[] = [];
+
+const mockFetch = (handlers: Record<string, Handler>) => {
+  const fetchMock = vi.fn((url: string, init?: RequestInit) => {
+    const method = (init?.method ?? "GET").toUpperCase();
+    calls.push({ url, method, body: init?.body ? JSON.parse(String(init.body)) : null });
+
+    // Exact path match: "/api/boards" must not also answer "/api/boards/1".
+    for (const [key, handler] of Object.entries(handlers)) {
+      const [path, pathMethod] = key.split(" ");
+      if (path === url && (!pathMethod || pathMethod === method)) {
+        const { status, body } = handler(url, init);
+        return Promise.resolve(json(status, body));
+      }
+    }
+    return Promise.resolve(json(404, { detail: "Not Found" }));
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+};
+
+const baseHandlers = () => ({
+  "/api/boards GET": () => ({ status: 200, body: [{ id: 1, title: "My Board" }] }),
+  "/api/boards/1 GET": () => ({ status: 200, body: board }),
+});
+
+const firstColumn = () => screen.getAllByTestId(/column-/i)[0];
 
 describe("KanbanBoard", () => {
-  it("renders five columns", () => {
-    render(<KanbanBoard />);
-    expect(screen.getAllByTestId(/column-/i)).toHaveLength(5);
+  beforeEach(() => {
+    window.localStorage.clear();
+    calls.length = 0;
+    vi.restoreAllMocks();
   });
 
-  it("renames a column", async () => {
+  it("shows a loading state before the board arrives", () => {
+    mockFetch(baseHandlers());
     render(<KanbanBoard />);
-    const column = getFirstColumn();
-    const input = within(column).getByLabelText("Column title");
-    await userEvent.clear(input);
-    await userEvent.type(input, "New Name");
-    expect(input).toHaveValue("New Name");
+
+    expect(screen.getByText(/loading your board/i)).toBeInTheDocument();
   });
 
-  it("adds and removes a card", async () => {
+  it("renders the columns and cards returned by the API", async () => {
+    mockFetch(baseHandlers());
     render(<KanbanBoard />);
-    const column = getFirstColumn();
-    const addButton = within(column).getByRole("button", {
-      name: /add a card/i,
+
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+    expect(screen.getByText("Align roadmap themes")).toBeInTheDocument();
+    expect(within(firstColumn()).getAllByTestId(/card-/i)).toHaveLength(2);
+  });
+
+  it("requests the board summary before the board itself", async () => {
+    mockFetch(baseHandlers());
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    expect(calls[0]).toMatchObject({ url: "/api/boards", method: "GET" });
+    expect(calls[1]).toMatchObject({ url: "/api/boards/1", method: "GET" });
+  });
+
+  it("shows an error with a retry when the board cannot be loaded", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      "/api/boards GET": () => ({ status: 500, body: { detail: "boom" } }),
     });
-    await userEvent.click(addButton);
+    render(<KanbanBoard />);
 
-    const titleInput = within(column).getByPlaceholderText(/card title/i);
-    await userEvent.type(titleInput, "New card");
-    const detailsInput = within(column).getByPlaceholderText(/details/i);
-    await userEvent.type(detailsInput, "Notes");
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(/could not load your board/i);
 
-    await userEvent.click(within(column).getByRole("button", { name: /add card/i }));
+    await user.click(screen.getByRole("button", { name: /try again/i }));
+    expect(calls.length).toBeGreaterThanOrEqual(2);
+  });
 
-    expect(within(column).getByText("New card")).toBeInTheDocument();
-
-    const deleteButton = within(column).getByRole("button", {
-      name: /delete new card/i,
+  it("persists a column rename after the debounce", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...baseHandlers(),
+      "/api/columns/1 PATCH": () => ({ status: 200, body: null }),
     });
-    await userEvent.click(deleteButton);
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
 
-    expect(within(column).queryByText("New card")).not.toBeInTheDocument();
+    const input = within(firstColumn()).getByLabelText("Column title");
+    await user.clear(input);
+    await user.type(input, "Icebox");
+
+    expect(input).toHaveValue("Icebox");
+    await waitFor(
+      () =>
+        expect(
+          calls.some(
+            (call) =>
+              call.url === "/api/columns/1" &&
+              call.method === "PATCH" &&
+              (call.body as { title: string })?.title === "Icebox"
+          )
+        ).toBe(true),
+      { timeout: 2000 }
+    );
+  });
+
+  it("collapses rapid renames into a single request", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...baseHandlers(),
+      "/api/columns/1 PATCH": () => ({ status: 200, body: null }),
+    });
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    const input = within(firstColumn()).getByLabelText("Column title");
+    await user.clear(input);
+    await user.type(input, "Icebox");
+
+    await waitFor(
+      () => expect(calls.filter((c) => c.method === "PATCH")).toHaveLength(1),
+      { timeout: 2000 }
+    );
+  });
+
+  it("adds a card and appends the card the API returns", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...baseHandlers(),
+      "/api/columns/1/cards POST": () => ({
+        status: 201,
+        body: { id: 99, title: "New card", details: "Notes" },
+      }),
+    });
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    const column = firstColumn();
+    await user.click(within(column).getByRole("button", { name: /add a card/i }));
+    await user.type(within(column).getByPlaceholderText(/card title/i), "New card");
+    await user.type(within(column).getByPlaceholderText(/details/i), "Notes");
+    await user.click(within(column).getByRole("button", { name: /add card/i }));
+
+    expect(await within(column).findByText("New card")).toBeInTheDocument();
+    expect(calls).toContainEqual({
+      url: "/api/columns/1/cards",
+      method: "POST",
+      body: { title: "New card", details: "Notes" },
+    });
+  });
+
+  it("deletes a card and calls the API", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...baseHandlers(),
+      "/api/cards/1 DELETE": () => ({ status: 204 }),
+    });
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    await user.click(screen.getByRole("button", { name: /delete align roadmap themes/i }));
+
+    await waitFor(() =>
+      expect(screen.queryByText("Align roadmap themes")).not.toBeInTheDocument()
+    );
+    expect(calls).toContainEqual({
+      url: "/api/cards/1",
+      method: "DELETE",
+      body: null,
+    });
+  });
+
+  it("restores the card when the delete request fails", async () => {
+    const user = userEvent.setup();
+    mockFetch({
+      ...baseHandlers(),
+      "/api/cards/1 DELETE": () => ({ status: 500, body: { detail: "boom" } }),
+    });
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    await user.click(screen.getByRole("button", { name: /delete align roadmap themes/i }));
+
+    // Reloaded from the API, so the card comes back.
+    expect(await screen.findByText("Align roadmap themes")).toBeInTheDocument();
   });
 });

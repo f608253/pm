@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -11,13 +11,33 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { ChatSidebar } from "@/components/ChatSidebar";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
-import { createId, initialData, moveCard, type BoardData } from "@/lib/kanban";
+import { moveCard, type Board, type Card } from "@/lib/kanban";
+import {
+  createCard as createCardRequest,
+  deleteCard as deleteCardRequest,
+  fetchBoard,
+  fetchBoardSummaries,
+  renameColumn as renameColumnRequest,
+  updateCard,
+} from "@/lib/api";
 
-export const KanbanBoard = () => {
-  const [board, setBoard] = useState<BoardData>(() => initialData);
-  const [activeCardId, setActiveCardId] = useState<string | null>(null);
+type KanbanBoardProps = {
+  username?: string;
+  onLogout?: () => void;
+};
+
+type Status = "loading" | "ready" | "error";
+
+export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
+  const [board, setBoard] = useState<Board | null>(null);
+  const [status, setStatus] = useState<Status>("loading");
+  const [error, setError] = useState<string | null>(null);
+  const [activeCard, setActiveCard] = useState<Card | null>(null);
+
+  const renameTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -25,71 +45,200 @@ export const KanbanBoard = () => {
     })
   );
 
-  const cardsById = useMemo(() => board.cards, [board.cards]);
+  const fetchBoardData = useCallback(
+    () =>
+      fetchBoardSummaries()
+        .then((summaries) =>
+          summaries.length === 0 ? null : fetchBoard(summaries[0].id)
+        )
+        .then((next) => {
+          setBoard(next);
+          setStatus("ready");
+        })
+        .catch(() => {
+          setError("Could not load your board.");
+          setStatus("error");
+        }),
+    []
+  );
 
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveCardId(event.active.id as string);
+  const load = useCallback(async () => {
+    setStatus("loading");
+    await fetchBoardData();
+  }, [fetchBoardData]);
+
+  useEffect(() => {
+    void fetchBoardData();
+  }, [fetchBoardData]);
+
+  useEffect(() => {
+    const timers = renameTimers.current;
+    return () => {
+      timers.forEach((timer) => clearTimeout(timer));
+      timers.clear();
+    };
+  }, []);
+
+  const fail = async (message: string) => {
+    setError(message);
+    await load();
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveCardId(null);
+  const handleRenameColumn = (columnId: number, title: string) => {
+    setBoard((prev) =>
+      prev
+        ? {
+            ...prev,
+            columns: prev.columns.map((column) =>
+              column.id === columnId ? { ...column, title } : column
+            ),
+          }
+        : prev
+    );
 
-    if (!over || active.id === over.id) {
+    // Typing fires on every keystroke, so collapse to one write per pause.
+    const timers = renameTimers.current;
+    const pending = timers.get(columnId);
+    if (pending) {
+      clearTimeout(pending);
+    }
+    timers.set(
+      columnId,
+      setTimeout(() => {
+        timers.delete(columnId);
+        renameColumnRequest(columnId, title).catch(() =>
+          void fail("Could not rename that column.")
+        );
+      }, 400)
+    );
+  };
+
+  const handleAddCard = async (columnId: number, title: string, details: string) => {
+    try {
+      const created = await createCardRequest(columnId, title, details || "");
+      setBoard((prev) =>
+        prev
+          ? {
+              ...prev,
+              columns: prev.columns.map((column) =>
+                column.id === columnId
+                  ? { ...column, cards: [...column.cards, created] }
+                  : column
+              ),
+            }
+          : prev
+      );
+    } catch {
+      await fail("Could not add that card.");
+    }
+  };
+
+  const handleDeleteCard = async (cardId: number) => {
+    const previous = board;
+    setBoard((prev) =>
+      prev
+        ? {
+            ...prev,
+            columns: prev.columns.map((column) => ({
+              ...column,
+              cards: column.cards.filter((card) => card.id !== cardId),
+            })),
+          }
+        : prev
+    );
+    try {
+      await deleteCardRequest(cardId);
+    } catch {
+      setBoard(previous);
+      await fail("Could not delete that card.");
+    }
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const cardId = Number(String(event.active.id).slice(1));
+    const found = board?.columns
+      .flatMap((column) => column.cards)
+      .find((card) => card.id === cardId);
+    setActiveCard(found ?? null);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    setActiveCard(null);
+
+    const { active, over } = event;
+    if (!over || active.id === over.id || !board) {
       return;
     }
 
-    setBoard((prev) => ({
-      ...prev,
-      columns: moveCard(prev.columns, active.id as string, over.id as string),
-    }));
+    const nextColumns = moveCard(
+      board.columns,
+      String(active.id),
+      String(over.id)
+    );
+    if (nextColumns === board.columns) {
+      return;
+    }
+
+    const cardDnd = String(active.id);
+    const cardId = Number(cardDnd.slice(1));
+    const targetColumn = nextColumns.find((column) =>
+      column.cards.some((card) => card.id === cardId)
+    );
+    if (!targetColumn) {
+      return;
+    }
+    const position = targetColumn.cards.findIndex((card) => card.id === cardId);
+
+    const previous = board;
+    setBoard({ ...board, columns: nextColumns });
+    try {
+      await updateCard(cardId, {
+        column_id: targetColumn.id,
+        position,
+      });
+    } catch {
+      setBoard(previous);
+      await fail("Could not move that card.");
+    }
   };
 
-  const handleRenameColumn = (columnId: string, title: string) => {
-    setBoard((prev) => ({
-      ...prev,
-      columns: prev.columns.map((column) =>
-        column.id === columnId ? { ...column, title } : column
-      ),
-    }));
-  };
+  if (status === "loading") {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-[var(--gray-text)]">Loading your board...</p>
+      </main>
+    );
+  }
 
-  const handleAddCard = (columnId: string, title: string, details: string) => {
-    const id = createId("card");
-    setBoard((prev) => ({
-      ...prev,
-      cards: {
-        ...prev.cards,
-        [id]: { id, title, details: details || "No details yet." },
-      },
-      columns: prev.columns.map((column) =>
-        column.id === columnId
-          ? { ...column, cardIds: [...column.cardIds, id] }
-          : column
-      ),
-    }));
-  };
+  if (status === "error") {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <div className="w-full max-w-md rounded-[32px] border border-[var(--stroke)] bg-white/85 p-8 text-center shadow-[var(--shadow)]">
+          <h1 className="font-display text-xl font-semibold text-[var(--navy-dark)]">
+            Something went wrong
+          </h1>
+          <p role="alert" className="mt-3 text-sm text-[var(--gray-text)]">
+            {error}
+          </p>
+          <button
+            type="button"
+            onClick={() => void load()}
+            className="mt-6 rounded-2xl bg-[var(--secondary-purple)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+          >
+            Try again
+          </button>
+        </div>
+      </main>
+    );
+  }
 
-  const handleDeleteCard = (columnId: string, cardId: string) => {
-    setBoard((prev) => {
-      return {
-        ...prev,
-        cards: Object.fromEntries(
-          Object.entries(prev.cards).filter(([id]) => id !== cardId)
-        ),
-        columns: prev.columns.map((column) =>
-          column.id === columnId
-            ? {
-                ...column,
-                cardIds: column.cardIds.filter((id) => id !== cardId),
-              }
-            : column
-        ),
-      };
-    });
-  };
-
-  const activeCard = activeCardId ? cardsById[activeCardId] : null;
+  if (!board) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-[var(--gray-text)]">No board yet.</p>
+      </main>
+    );
+  }
 
   return (
     <div className="relative overflow-hidden">
@@ -111,15 +260,36 @@ export const KanbanBoard = () => {
                 and capture quick notes without getting buried in settings.
               </p>
             </div>
-            <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
-                Focus
-              </p>
-              <p className="mt-2 text-lg font-semibold text-[var(--primary-blue)]">
-                One board. Five columns. Zero clutter.
-              </p>
+            <div className="flex flex-col gap-4">
+              <div className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] px-5 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
+                  Focus
+                </p>
+                <p className="mt-2 text-lg font-semibold text-[var(--primary-blue)]">
+                  One board. Five columns. Zero clutter.
+                </p>
+              </div>
+              {onLogout ? (
+                <div className="flex items-center justify-between gap-4 rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] px-5 py-4">
+                  <span className="text-sm font-medium text-[var(--navy-dark)]">
+                    Signed in as {username}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onLogout}
+                    className="rounded-full border border-[var(--stroke)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)]"
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
+          {error ? (
+            <p role="alert" className="text-sm font-medium text-[var(--secondary-purple)]">
+              {error}
+            </p>
+          ) : null}
           <div className="flex flex-wrap items-center gap-4">
             {board.columns.map((column) => (
               <div
@@ -144,7 +314,6 @@ export const KanbanBoard = () => {
               <KanbanColumn
                 key={column.id}
                 column={column}
-                cards={column.cardIds.map((cardId) => board.cards[cardId])}
                 onRename={handleRenameColumn}
                 onAddCard={handleAddCard}
                 onDeleteCard={handleDeleteCard}
@@ -159,6 +328,8 @@ export const KanbanBoard = () => {
             ) : null}
           </DragOverlay>
         </DndContext>
+
+        <ChatSidebar board={board} onBoardChange={setBoard} />
       </main>
     </div>
   );

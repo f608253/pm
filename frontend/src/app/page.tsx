@@ -1,5 +1,5 @@
-import { KanbanBoard } from "@/components/KanbanBoard";
+import { AppRoot } from "@/components/AppRoot";
 
 export default function Home() {
-  return <KanbanBoard />;
+  return <AppRoot />;
 }
