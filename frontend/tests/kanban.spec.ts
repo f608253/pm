@@ -241,6 +241,60 @@ test("data survives logging out and back in", async ({ page }) => {
   await expect(cardIn(column(page, 4), title)).toHaveCount(0);
 });
 
+test("the assistant moves and deletes cards on request", async ({ page }) => {
+  await signIn(page);
+  const title = uniqueTitle("AI move me");
+
+  // Create the card through the board so the test controls its name exactly.
+  const target = column(page, 4);
+  const created = writeTo(page, "POST", /\/api\/columns\/\d+\/cards$/);
+  await target.getByRole("button", { name: /add a card/i }).click();
+  await target.getByPlaceholder("Card title").fill(title);
+  await target.getByRole("button", { name: /add card/i }).click();
+  await created;
+  await expect(cardIn(column(page, 4), title)).toBeVisible();
+
+  await page.getByRole("button", { name: "Ask the assistant" }).click();
+  const log = page.getByTestId("chat-log");
+  await page
+    .getByLabel("Message the assistant")
+    .fill(`Move the card named ${title} to the Review column.`);
+  await page.getByLabel("Message the assistant").press("Enter");
+
+  await expect(cardIn(column(page, 3), title)).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByTestId("chat-notice")).toContainText("Review", { timeout: 120_000 });
+
+  await page
+    .getByLabel("Message the assistant")
+    .fill(`Now delete the card named ${title}.`);
+  await page.getByLabel("Message the assistant").press("Enter");
+
+  await expect(log).toContainText("Deleted", { timeout: 120_000 });
+  await page.reload();
+  await expect(cardIn(column(page, 3), title)).toHaveCount(0);
+});
+
+test("the assistant panel is usable on a mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await signIn(page);
+
+  const panel = page.getByTestId("chat-sidebar");
+  await expect(panel).not.toBeVisible();
+
+  await page.getByRole("button", { name: "Ask the assistant" }).click();
+  await expect(panel).toBeVisible();
+
+  const box = await panel.boundingBox();
+  expect(box).not.toBeNull();
+  // Full width on a phone, and reachable without horizontal scrolling.
+  expect(box!.width).toBeGreaterThanOrEqual(380);
+  expect(box!.x).toBeLessThanOrEqual(1);
+
+  await expect(page.getByLabel("Message the assistant")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Close", exact: true })).toBeVisible();
+});
+
 test("an expired session returns the user to the sign in form", async ({ page }) => {
   await signIn(page);
 
