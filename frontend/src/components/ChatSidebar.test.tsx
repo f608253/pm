@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ChatInput } from "@/components/ChatInput";
@@ -304,6 +304,35 @@ describe("ChatSidebar", () => {
 
     release?.();
     await waitFor(() => expect(screen.getByText("Done")).toBeVisible());
+  });
+
+  it("closes on a right swipe", async () => {
+    const panel = await renderOpen().then(() => screen.getByTestId("chat-sidebar"));
+
+    fireEvent.touchStart(panel, { touches: [{ clientX: 40 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 200 }] });
+
+    expect(screen.getByRole("button", { name: "Ask the assistant" })).toBeVisible();
+  });
+
+  it("stays open on a short swipe", async () => {
+    await renderOpen();
+    const panel = screen.getByTestId("chat-sidebar");
+
+    fireEvent.touchStart(panel, { touches: [{ clientX: 40 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 70 }] });
+
+    expect(screen.getByRole("button", { name: "Close", exact: true })).toBeVisible();
+  });
+
+  it("stays open on a left swipe", async () => {
+    await renderOpen();
+    const panel = screen.getByTestId("chat-sidebar");
+
+    fireEvent.touchStart(panel, { touches: [{ clientX: 200 }] });
+    fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 40 }] });
+
+    expect(screen.getByRole("button", { name: "Close", exact: true })).toBeVisible();
   });
 
   it("disables Clear when there is nothing to clear", async () => {

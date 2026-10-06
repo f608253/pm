@@ -5,25 +5,29 @@ import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "@/components/ChatInput";
 import { ChatMessageView } from "@/components/ChatMessageView";
 import { TypingIndicator } from "@/components/TypingIndicator";
-import { sendChatMessage } from "@/lib/api";
+import { ApiError, sendChatMessage } from "@/lib/api";
 import type { ChatMessage } from "@/lib/chat";
 import type { Board } from "@/lib/kanban";
 
 type Props = {
   board: Board;
   onBoardChange: (board: Board) => void;
+  showToggle?: boolean;
 };
+
+const SWIPE_CLOSE_THRESHOLD = 80;
 
 let counter = 0;
 const nextId = () => `m${(counter += 1)}`;
 
-export const ChatSidebar = ({ board, onBoardChange }: Props) => {
+export const ChatSidebar = ({ board, onBoardChange, showToggle = true }: Props) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const logRef = useRef<HTMLUListElement>(null);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const node = logRef.current;
@@ -31,6 +35,12 @@ export const ChatSidebar = ({ board, onBoardChange }: Props) => {
       node.scrollTop = node.scrollHeight;
     }
   }, [messages, loading]);
+
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener("open-chat", handler);
+    return () => window.removeEventListener("open-chat", handler);
+  }, []);
 
   const send = async (question: string) => {
     setMessages((prev) => [
@@ -65,16 +75,22 @@ export const ChatSidebar = ({ board, onBoardChange }: Props) => {
       if (result.skipped.length > 0) {
         setError(`Skipped: ${result.skipped.join("; ")}`);
       }
-    } catch {
-      setError("The assistant could not be reached. Please try again.");
-    } finally {
+} catch (err) {
+        // Show the reason the API gave, otherwise a config problem like a
+        // rejected API key looks identical to a dropped connection.
+        const reason =
+          err instanceof ApiError && err.status !== 401
+            ? err.message
+            : "The assistant could not be reached. Please try again.";
+        setError(reason);
+      } finally {
       setLoading(false);
     }
   };
 
   return (
     <>
-      {!open ? (
+      {showToggle && !open ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -91,6 +107,21 @@ export const ChatSidebar = ({ board, onBoardChange }: Props) => {
         data-testid="chat-sidebar"
         aria-label="Board assistant"
         aria-hidden={!open}
+        onTouchStart={(event) => {
+          touchStartX.current = event.touches[0]?.clientX ?? null;
+        }}
+        onTouchEnd={(event) => {
+          const start = touchStartX.current;
+          touchStartX.current = null;
+          if (start === null) {
+            return;
+          }
+          const end = event.changedTouches[0]?.clientX ?? start;
+          // Swiping right pulls the panel away, matching how it slides in.
+          if (end - start > SWIPE_CLOSE_THRESHOLD) {
+            setOpen(false);
+          }
+        }}
         className={
           open
             ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-0 flex-col border-l border-[var(--stroke)] bg-white shadow-[var(--shadow)] transition-transform duration-300"

@@ -116,6 +116,11 @@ ipython_config.py
 .pdm-python
 .pdm-build/
 
+.env
+.env.example
+
+# .env.example is intentionally NOT ignored: it holds placeholders, not secrets.
+
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
 

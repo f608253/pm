@@ -30,7 +30,12 @@ def to_board_out(board: Board) -> BoardOut:
                 id=column.id,
                 title=column.title,
                 cards=[
-                    CardOut(id=card.id, title=card.title, details=card.details)
+                    CardOut(
+                        id=card.id,
+                        title=card.title,
+                        details=card.details,
+                        priority=card.priority,
+                    )
                     for card in column.cards
                 ],
             )

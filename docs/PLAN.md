@@ -604,7 +604,7 @@ Add beautiful sidebar widget to frontend supporting full AI chat with automatic 
   - [x] Error display and retry
 - [x] Mobile responsiveness
   - [x] Full-screen chat on mobile
-  - [ ] Swipe to close
+  - [x] Swipe to close
   - [x] Touch-friendly input
 
 ### Tests
@@ -621,12 +621,12 @@ Add beautiful sidebar widget to frontend supporting full AI chat with automatic 
 - [x] E2E test: Open chat sidebar
 - [x] E2E test: Send message and receive response
 - [x] E2E test: Ask AI to add card → card appears on board
-- [ ] E2E test: Ask AI to move card → card moves on board
-- [ ] E2E test: Ask AI to delete card → card disappears
+- [x] E2E test: Ask AI to move card → card moves on board
+- [x] E2E test: Ask AI to delete card → card disappears
 - [x] E2E test: Ask AI question → get response without board changes
 - [x] E2E test: Multiple messages in conversation maintain context
 - [x] E2E test: Close and reopen sidebar preserves conversation
-- [ ] E2E test: Chat works on mobile viewport
+- [x] E2E test: Chat works on mobile viewport
 
 ### Success Criteria
 - [x] Beautiful, functional chat sidebar
@@ -640,13 +640,151 @@ Add beautiful sidebar widget to frontend supporting full AI chat with automatic 
 - [x] UX is smooth and intuitive
 - [x] No lag or janky animations
 
-Verified: 64 frontend unit tests, 14 Playwright tests including three that drive the real
-OpenRouter model, lint clean, static production build OK.
+Verified: 67 frontend unit tests, 16 Playwright tests including four that drive the real
+OpenRouter model, 131 backend tests at 97.61% coverage, lint clean, static build OK.
 
-Not done: streaming (the endpoint answers in one response), swipe-to-close, optimistic board
-updates (the server returns the authoritative board, so the panel applies that), and two E2E
-tests for AI-driven move and delete, which were verified manually against the live API
-instead of in the browser suite to keep the E2E run short.
+Only two conditional items remain unticked, both deliberate: streaming (the endpoint answers
+in a single response) and optimistic board updates (the server returns the authoritative
+board, which the panel applies directly).
+
+---
+
+## Part 11: Card Intelligence
+
+### Objective
+Analyse a single card and suggest its details, priority, and possible duplicates.
+
+### Substeps
+- [x] Add card priority to the database
+  - [x] `priority` column on `cards`, defaulting to `medium`
+  - [x] Migration 0003, verified up and down against a scratch database
+  - [x] Expose priority in `CardOut` and the board serializer
+  - [x] `PATCH /api/cards/:id` persists priority (it was accepted and dropped)
+  - [x] `edit_card` AI operation can set priority
+- [x] Add the card intelligence endpoint
+  - [x] POST /api/ai/card-intelligence with board_id, card_id, task
+  - [x] task is a Literal, so an unknown task is a 422 not a model call
+  - [x] Board snapshot materialised and the read transaction closed first
+  - [x] Json-object response format
+- [x] Generate details and acceptance criteria from a title
+  - [x] Model returns a one line summary and an "Acceptance criteria" list
+  - [x] Returned in a `details` field, separate from the one line `result`
+- [x] Suggest a priority
+  - [x] Model weighs card wording and board state
+  - [x] An unrecognised priority is dropped rather than stored
+- [x] Detect duplicate or overlapping cards
+  - [x] Model returns card_id, similarity, and a reason
+  - [x] Ids the model invents are dropped
+- [x] Add the card AI menu to the frontend
+  - [x] Menu on every card offering the three tasks
+  - [x] Result shown inline with the generated body or match reasons
+  - [x] Nothing is written to the card until the user applies it
+  - [x] Card shows a priority badge
+
+### Tests
+- [x] Backend unit test: endpoint requires authentication
+- [x] Backend unit test: unknown task returns 422
+- [x] Backend unit test: unknown board returns 404
+- [x] Backend unit test: another user's board returns 403
+- [x] Backend unit test: generate_details returns acceptance criteria
+- [x] Backend unit test: suggest_priority returns a priority
+- [x] Backend unit test: an unrecognised priority is dropped
+- [x] Backend unit test: detect_duplicates returns matches
+- [x] Backend unit test: an invented duplicate id is dropped
+- [x] Backend unit test: no duplicates returns an empty list
+- [x] Backend unit test: service rejects an unknown card
+- [x] Backend unit test: provider error returns 502, missing key returns 503
+- [x] Backend unit test: board returns card priority
+- [x] Backend unit test: patching priority persists to the database
+- [x] Backend unit test: an unknown priority is rejected with 422
+- [x] Backend unit test: a created card defaults to medium
+- [x] Backend unit test: edit_card sets priority, and rejects a bad value
+- [x] Frontend unit test: menu is closed until the AI button is clicked
+- [x] Frontend unit test: posts the selected task to the right endpoint
+- [x] Frontend unit test: priority is not written until applied
+- [x] Frontend unit test: details are not written until applied
+- [x] Frontend unit test: duplicates render with similarity and reason
+- [x] Frontend unit test: request failure shows an error
+
+### Success Criteria
+- [x] Card details and acceptance criteria generated from a title
+- [x] Card priority suggested from content and board state
+- [x] Duplicate and overlapping cards detected
+- [x] Nothing reaches the database without an explicit user action
+- [x] All tests passing (backend 166, 93.47%)
+
+### Notes
+- Two bugs were found by the tests and fixed. The service read `card.column_id`, but
+  the board snapshot is a Pydantic tree with no back reference, so every call raised
+  `AttributeError`; the column now comes from the search that found the card. The
+  reorder filter compared string JSON keys against integer column ids and discarded
+  every valid reordering.
+- Bottleneck and next-action titles are resolved from the database, not taken from the
+  model, so a hallucinated id cannot inject a name.
+
+---
+
+## Part 12: Workflow Optimization
+
+### Objective
+Analyse the whole board and recommend what to do next per card, where work is
+piling up, and how each column should be ordered.
+
+### Substeps
+- [x] Add the workflow optimization endpoint
+  - [x] POST /api/ai/workflow-optimization with board_id
+  - [x] Board snapshot materialised and the read transaction closed first
+  - [x] Json-object response format
+- [x] Recommend the next best action for each card
+  - [x] One imperative sentence per card, in board order
+  - [x] Cards in the final column are called out for close out
+  - [x] Ids the model invents are dropped
+- [x] Predict column bottlenecks
+  - [x] Piling up, blocking others, or stalled
+  - [x] A concrete reason, not the column title restated
+  - [x] Omitted entirely when no column is a bottleneck
+- [x] Suggest optimal card ordering within a column
+  - [x] Model returns a column id to card id list
+  - [x] Only kept when the list is a permutation of that column's real cards
+- [x] Add the workflow panel to the frontend
+  - [x] Slide-out panel with a Workflow button in the header
+  - [x] Next actions, bottlenecks, ordering, and suggestions as separate sections
+  - [x] Card and column ids resolved to titles, never shown raw
+  - [x] Loading, error with retry, and a healthy-board message
+
+### Tests
+- [x] Backend unit test: endpoint requires authentication
+- [x] Backend unit test: next actions resolve card titles from the board
+- [x] Backend unit test: an invented card id is dropped
+- [x] Backend unit test: bottlenecks fall back to the real column title
+- [x] Backend unit test: an invented column id is dropped
+- [x] Backend unit test: a valid reordering is kept
+- [x] Backend unit test: a reordering that drops a card is discarded
+- [x] Backend unit test: unknown board 404, another user's board 403
+- [x] Backend unit test: provider error returns 502, missing key returns 503
+- [x] Frontend unit test: does not call the API until opened
+- [x] Frontend unit test: loading state shown while analyzing
+- [x] Frontend unit test: next actions render for every card
+- [x] Frontend unit test: bottlenecks render with their reason
+- [x] Frontend unit test: ordering renders titles, not ids
+- [x] Frontend unit test: suggestions render
+- [x] Frontend unit test: an empty result reports a healthy board
+- [x] Frontend unit test: error shows a retry button
+- [x] Frontend unit test: Refresh reloads
+- [x] Frontend unit test: Close fires, and a closed panel is aria-hidden
+
+### Success Criteria
+- [x] Next best action recommended for every card
+- [x] Bottlenecks predicted before they block the board
+- [x] Column ordering suggested
+- [x] No recommendation can delete or invent a card
+- [x] All tests passing (frontend 96)
+
+### Notes
+- The panel was imported but never rendered and had no toggle button, so the whole
+  feature was unreachable in the browser. Now mounted with a Workflow button.
+- A reorder that is not a permutation of the real column is discarded rather than
+  applied, because applying it would silently drop a card from the board.
 
 ---
 

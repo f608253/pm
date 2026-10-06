@@ -77,8 +77,14 @@ def apply_operation(db: Session, op: dict, user: User) -> str:
                 raise OperationRejected("details must be text")
             card.details = details[:MAX_DETAILS]
             changed = True
+        if op.get("priority") is not None:
+            priority = _text(op.get("priority"), 16, "priority")
+            if priority not in {"high", "medium", "low"}:
+                raise OperationRejected("priority must be high, medium, or low")
+            card.priority = priority
+            changed = True
         if not changed:
-            raise OperationRejected("edit_card needs a title or details")
+            raise OperationRejected("edit_card needs a title, details, or priority")
         return f'Updated "{card.title}"'
 
     if kind == "move_card":

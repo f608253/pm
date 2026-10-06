@@ -118,10 +118,26 @@ def test_chat_raises_client_error_without_retrying(monkeypatch, key):
 
     monkeypatch.setattr(httpx, "post", fake_post)
 
-    with pytest.raises(ai.AiError, match="401"):
+    with pytest.raises(ai.AiNotConfigured):
         ai.chat([{"role": "user", "content": "hi"}])
 
     assert len(calls) == 1
+
+
+def test_rejected_key_reports_a_configuration_problem(monkeypatch, key):
+    monkeypatch.setattr(
+        httpx, "post", lambda *a, **k: FakeResponse(401, text="User not found.")
+    )
+
+    with pytest.raises(ai.AiNotConfigured, match="rejected"):
+        ai.chat([{"role": "user", "content": "hi"}])
+
+
+def test_forbidden_key_is_treated_as_a_configuration_problem(monkeypatch, key):
+    monkeypatch.setattr(httpx, "post", lambda *a, **k: FakeResponse(403, text="nope"))
+
+    with pytest.raises(ai.AiNotConfigured):
+        ai.chat([{"role": "user", "content": "hi"}])
 
 
 def test_chat_retries_rate_limit_then_succeeds(monkeypatch, key):

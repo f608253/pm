@@ -12,6 +12,9 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { ChatSidebar } from "@/components/ChatSidebar";
+import { AINewsPanel } from "@/components/AINewsPanel";
+import { DailySummaryPanel } from "@/components/DailySummaryPanel";
+import { WorkflowPanel } from "@/components/WorkflowPanel";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
 import { moveCard, type Board, type Card } from "@/lib/kanban";
@@ -36,6 +39,9 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
   const [status, setStatus] = useState<Status>("loading");
   const [error, setError] = useState<string | null>(null);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
+  const [newsOpen, setNewsOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
 
   const renameTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
 
@@ -151,6 +157,29 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
     } catch {
       setBoard(previous);
       await fail("Could not delete that card.");
+    }
+  };
+
+  const handleUpdateCard = async (cardId: number, updates: { details?: string; priority?: string }) => {
+    const previous = board;
+    setBoard((prev) =>
+      prev
+        ? {
+            ...prev,
+            columns: prev.columns.map((column) => ({
+              ...column,
+              cards: column.cards.map((card) =>
+                card.id === cardId ? { ...card, ...updates } : card
+              ),
+            })),
+          }
+        : prev
+    );
+    try {
+      await updateCard(cardId, updates);
+    } catch {
+      setBoard(previous);
+      await fail("Could not update that card.");
     }
   };
 
@@ -317,6 +346,8 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
                 onRename={handleRenameColumn}
                 onAddCard={handleAddCard}
                 onDeleteCard={handleDeleteCard}
+                onUpdateCard={handleUpdateCard}
+                boardId={board.id}
               />
             ))}
           </section>
@@ -329,7 +360,50 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
           </DragOverlay>
         </DndContext>
 
-        <ChatSidebar board={board} onBoardChange={setBoard} />
+        <ChatSidebar board={board} onBoardChange={setBoard} showToggle={false} />
+        <AINewsPanel open={newsOpen} onClose={() => setNewsOpen(false)} />
+        <DailySummaryPanel open={summaryOpen} onClose={() => setSummaryOpen(false)} boardId={board.id} />
+        <WorkflowPanel open={workflowOpen} onClose={() => setWorkflowOpen(false)} board={board} />
+        <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => setNewsOpen(true)}
+            aria-expanded={newsOpen}
+            aria-controls="ai-news-panel"
+            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            AI News
+          </button>
+          <button
+            type="button"
+            onClick={() => setSummaryOpen(true)}
+            aria-expanded={summaryOpen}
+            aria-controls="daily-summary-panel"
+            className="rounded-full bg-[var(--primary-blue)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Daily Summary
+          </button>
+          <button
+            type="button"
+            onClick={() => setWorkflowOpen(true)}
+            aria-expanded={workflowOpen}
+            aria-controls="workflow-panel"
+            className="rounded-full bg-[var(--navy-dark)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Workflow
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const event = new CustomEvent("open-chat");
+              window.dispatchEvent(event);
+            }}
+            aria-controls="chat-panel"
+            className="rounded-full bg-[var(--accent-yellow)] px-5 py-3 text-sm font-semibold text-[var(--navy-dark)] shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Chat
+          </button>
+        </div>
       </main>
     </div>
   );

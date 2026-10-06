@@ -2,13 +2,22 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
 import { cardDndId, type Card } from "@/lib/kanban";
+import { CardActionsMenu } from "@/components/CardActionsMenu";
 
 type KanbanCardProps = {
   card: Card;
   onDelete: (cardId: number) => void;
+  onUpdateCard: (cardId: number, updates: { details?: string; priority?: string }) => void;
+  boardId: number;
 };
 
-export const KanbanCard = ({ card, onDelete }: KanbanCardProps) => {
+const PRIORITY_COLORS: Record<string, string> = {
+  high: "bg-red-100 text-red-800 border-red-200",
+  medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  low: "bg-green-100 text-green-800 border-green-200",
+};
+
+export const KanbanCard = ({ card, onDelete, onUpdateCard, boardId }: KanbanCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: cardDndId(card.id) });
 
@@ -32,21 +41,34 @@ export const KanbanCard = ({ card, onDelete }: KanbanCardProps) => {
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
-            {card.title}
-          </h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
+              {card.title}
+            </h4>
+            <span
+              className={clsx(
+                "rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                PRIORITY_COLORS[card.priority] || "bg-gray-100 text-gray-800 border-gray-200"
+              )}
+            >
+              {card.priority}
+            </span>
+          </div>
           <p className="mt-2 text-sm leading-6 text-[var(--gray-text)]">
             {card.details}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => onDelete(card.id)}
-          className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
-          aria-label={`Delete ${card.title}`}
-        >
-          Remove
-        </button>
+        <div className="flex items-start gap-2">
+          <CardActionsMenu cardId={card.id} boardId={boardId} onUpdateCard={onUpdateCard} />
+          <button
+            type="button"
+            onClick={() => onDelete(card.id)}
+            className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
+            aria-label={`Delete ${card.title}`}
+          >
+            Remove
+          </button>
+        </div>
       </div>
     </article>
   );

@@ -85,6 +85,7 @@ class Card(Base):
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False)
     details: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    priority: Mapped[str] = mapped_column(String(16), nullable=False, default="medium")
     position: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=func.current_timestamp()

@@ -1,0 +1,14 @@
+{
+  "env": {
+    "ANTHROPIC_API_KEY": "sk-779aaa7ad931f30b-510d54-fbeb8d0f",
+    "ANTHROPIC_BASE_URL": "http://localhost:20128/v1",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "agy/gemini-3.7-flash-high",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "agy/gemini-pro-agent",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "memuna-way-combo"
+  },
+  "model": "haiku",
+  "effortLevel": "low",
+  "theme": "dark",
+  "switchModelsOnFlag": false
+}

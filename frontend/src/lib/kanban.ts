@@ -2,6 +2,7 @@ export type Card = {
   id: number;
   title: string;
   details: string;
+  priority: string;
 };
 
 export type Column = {

@@ -126,8 +126,24 @@ def test_edit_card_allows_details_only(db):
 
 def test_edit_card_requires_a_change(db):
     card = column_of(db, "Backlog").cards[0]
-    with pytest.raises(OperationRejected, match="needs a title or details"):
+    with pytest.raises(OperationRejected, match="needs a title, details, or priority"):
         apply_operation(db, {"type": "edit_card", "card_id": card.id}, user_of(db))
+
+
+def test_edit_card_updates_priority(db):
+    card = column_of(db, "Backlog").cards[0]
+    apply_operation(db, {"type": "edit_card", "card_id": card.id, "priority": "high"}, user_of(db))
+    db.commit()
+
+    assert reload_card(db, card.id).priority == "high"
+
+
+def test_edit_card_rejects_unknown_priority(db):
+    card = column_of(db, "Backlog").cards[0]
+    with pytest.raises(OperationRejected, match="priority must be"):
+        apply_operation(
+            db, {"type": "edit_card", "card_id": card.id, "priority": "urgent"}, user_of(db)
+        )
 
 
 def test_edit_card_rejects_unknown_card(db):

@@ -242,6 +242,8 @@ test("data survives logging out and back in", async ({ page }) => {
 });
 
 test("the assistant moves and deletes cards on request", async ({ page }) => {
+  // Two real model round trips will not fit the default budget.
+  test.slow();
   await signIn(page);
   const title = uniqueTitle("AI move me");
 
@@ -279,16 +281,22 @@ test("the assistant panel is usable on a mobile viewport", async ({ page }) => {
   await signIn(page);
 
   const panel = page.getByTestId("chat-sidebar");
-  await expect(panel).not.toBeVisible();
+  // The closed panel is slid off-screen rather than removed, so assert position.
+  await expect
+    .poll(async () => (await panel.boundingBox())!.x, { timeout: 5000 })
+    .toBeGreaterThanOrEqual(390);
 
   await page.getByRole("button", { name: "Ask the assistant" }).click();
-  await expect(panel).toBeVisible();
+  await expect(panel).toHaveAttribute("aria-hidden", "false");
 
-  const box = await panel.boundingBox();
-  expect(box).not.toBeNull();
-  // Full width on a phone, and reachable without horizontal scrolling.
-  expect(box!.width).toBeGreaterThanOrEqual(380);
-  expect(box!.x).toBeLessThanOrEqual(1);
+  // The panel slides in over 300ms, so wait for the transition to settle.
+  await expect
+    .poll(async () => (await panel.boundingBox())!.x, { timeout: 5000 })
+    .toBeLessThanOrEqual(1);
+
+  const box = (await panel.boundingBox())!;
+  // Full width on a phone, with no horizontal offset.
+  expect(box.width).toBeGreaterThanOrEqual(380);
 
   await expect(page.getByLabel("Message the assistant")).toBeVisible();
   await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
@@ -308,6 +316,8 @@ test("an expired session returns the user to the sign in form", async ({ page })
 });
 
 test("the assistant panel opens, chats, and closes", async ({ page }) => {
+  // Calls the real model, so allow more than the default budget.
+  test.slow();
   await signIn(page);
 
   await page.getByRole("button", { name: "Ask the assistant" }).click();
@@ -331,6 +341,8 @@ test("the assistant panel opens, chats, and closes", async ({ page }) => {
 });
 
 test("the assistant answers a question without changing the board", async ({ page }) => {
+  // Calls the real model, so allow more than the default budget.
+  test.slow();
   await signIn(page);
   const before = await page.locator('[data-testid^="card-"]').count();
 
@@ -345,6 +357,8 @@ test("the assistant answers a question without changing the board", async ({ pag
 });
 
 test("the assistant conversation survives closing the panel", async ({ page }) => {
+  // Calls the real model, so allow more than the default budget.
+  test.slow();
   await signIn(page);
 
   await page.getByRole("button", { name: "Ask the assistant" }).click();

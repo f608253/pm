@@ -10,6 +10,8 @@ type KanbanColumnProps = {
   onRename: (columnId: number, title: string) => void;
   onAddCard: (columnId: number, title: string, details: string) => void;
   onDeleteCard: (cardId: number) => void;
+  onUpdateCard: (cardId: number, updates: { details?: string; priority?: string }) => void;
+  boardId: number;
 };
 
 export const KanbanColumn = ({
@@ -17,6 +19,8 @@ export const KanbanColumn = ({
   onRename,
   onAddCard,
   onDeleteCard,
+  onUpdateCard,
+  boardId,
 }: KanbanColumnProps) => {
   const { setNodeRef, isOver } = useDroppable({ id: columnDndId(column.id) });
 
@@ -51,7 +55,7 @@ export const KanbanColumn = ({
           strategy={verticalListSortingStrategy}
         >
           {column.cards.map((card) => (
-            <KanbanCard key={card.id} card={card} onDelete={onDeleteCard} />
+            <KanbanCard key={card.id} card={card} onDelete={onDeleteCard} onUpdateCard={onUpdateCard} boardId={boardId} />
           ))}
         </SortableContext>
         {column.cards.length === 0 && (

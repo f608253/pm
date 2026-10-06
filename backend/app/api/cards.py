@@ -21,7 +21,9 @@ def create_card(
     db.add(card)
     db.commit()
     db.refresh(card)
-    return CardOut(id=card.id, title=card.title, details=card.details)
+    return CardOut(
+        id=card.id, title=card.title, details=card.details, priority=card.priority
+    )
 
 
 @router.patch("/cards/{card_id}", response_model=CardOut)
@@ -34,6 +36,8 @@ def update_card(
         card.title = payload.title
     if payload.details is not None:
         card.details = payload.details
+    if payload.priority is not None:
+        card.priority = payload.priority
     if payload.column_id is not None and payload.column_id != card.column_id:
         target = load_column(db, payload.column_id, user.id)
         move_card(db, card, target.id, payload.position if payload.position is not None else 0)
@@ -42,7 +46,9 @@ def update_card(
 
     db.commit()
     db.refresh(card)
-    return CardOut(id=card.id, title=card.title, details=card.details)
+    return CardOut(
+        id=card.id, title=card.title, details=card.details, priority=card.priority
+    )
 
 
 @router.delete("/cards/{card_id}", status_code=status.HTTP_204_NO_CONTENT)
