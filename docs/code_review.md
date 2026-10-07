@@ -10,16 +10,16 @@
 
 Kanban Studio is a full-stack MVP featuring a Next.js 16 App Router frontend, a FastAPI Python backend with SQLAlchemy 2.x and SQLite, and OpenRouter AI integration (`openai/gpt-oss-120b`). 
 
-A comprehensive static and dynamic code review was performed across the codebase. While the foundational architecture is solid (~97.6% test coverage, clean FastAPI routing, static export serving), the review identified **8 critical code defects** and several architectural improvements needed before production deployment.
+A comprehensive code review was performed across the codebase. While the foundational architecture is solid (~97.6% test coverage, clean FastAPI routing, static export serving), the review identified **8 verified code defects** and several architectural improvements needed before production deployment.
 
 ---
 
 ## 2. Verified Code Defects (Bug & Correctness Findings)
 
-### 🔴 Critical Correctness & Security Bugs
+### Critical Correctness & Security Bugs
 
 1. **Cross-Board Operations Vulnerability (`backend/app/services/board_ops.py:25`)**
-   - **Defect:** `_column` lookup verifies that the column belongs to the user, but does *not* verify that the target column belongs to the active board being operated on.
+   - **Defect:** `_column` lookup verifies that the column belongs to the user, but does not verify that the target column belongs to the active board being operated on.
    - **Failure Scenario:** If an AI prompt returned by a user asks to move a card to a column belonging to another board owned by the same user, `apply_operation` moves the card across boards, corrupting column and board data structures.
    - **Fix:** Add `Column.board_id == board.id` validation in `_column` lookup.
 
@@ -41,7 +41,7 @@ A comprehensive static and dynamic code review was performed across the codebase
 5. **Local State Overwrite on Renaming Failure (`frontend/src/components/KanbanBoard.tsx:115`)**
    - **Defect:** Debounced column renaming failure triggers `fail()`, which re-fetches the entire board state from the backend.
    - **Failure Scenario:** If a network blip occurs while typing a column title, all subsequent unsaved local board state edits are discarded and overwritten by the stale server state.
-   - **Fix:** Show a non-destructive toast/banner on rename failure without re-fetching the full board.
+   - **Fix:** Show a non-destructive banner on rename failure without re-fetching the full board.
 
 6. **Card Drag Event Interference with Action Buttons (`frontend/src/components/KanbanCard.tsx:38`)**
    - **Defect:** `@dnd-kit` drag listeners attached to the root `<article>` element do not stop event propagation on child buttons (such as the AI intelligence button or delete button).
@@ -80,14 +80,14 @@ A comprehensive static and dynamic code review was performed across the codebase
 
 | Task ID | Item | Category | Priority |
 |---------|------|----------|----------|
-| **FIX-1** | Restrict `_column` lookup to active board (`board_ops.py`) | Security / Bug | 🔴 High |
-| **FIX-2** | Connect the 5 AI Analysis Panels to `KanbanBoard.tsx` header | UI / Feature | 🔴 High |
-| **FIX-3** | Add exception handling for `fetch_ai_news` & sort chronologically | Backend Bug | 🔴 High |
-| **FIX-4** | Handle `null` safely in `workflow_optimization` | Backend Bug | 🔴 High |
-| **FIX-5** | Fix non-destructive error handling on debounced column rename | Frontend Bug | 🟡 Medium |
-| **FIX-6** | Stop drag propagation on `KanbanCard` action buttons | Frontend UX | 🟡 Medium |
-| **FIX-7** | Add click-outside listener to `CardActionsMenu` | Frontend UX | 🟡 Medium |
-| **FIX-8** | Migrate session storage to SQLite DB & fix CORS origins | Architecture | 🟡 Medium |
+| **FIX-1** | Restrict `_column` lookup to active board (`board_ops.py`) | Security / Bug | High |
+| **FIX-2** | Connect the 5 AI Analysis Panels to `KanbanBoard.tsx` header | UI / Feature | High |
+| **FIX-3** | Add exception handling for `fetch_ai_news` & sort chronologically | Backend Bug | High |
+| **FIX-4** | Handle `null` safely in `workflow_optimization` | Backend Bug | High |
+| **FIX-5** | Fix non-destructive error handling on debounced column rename | Frontend Bug | Medium |
+| **FIX-6** | Stop drag propagation on `KanbanCard` action buttons | Frontend UX | Medium |
+| **FIX-7** | Add click-outside listener to `CardActionsMenu` | Frontend UX | Medium |
+| **FIX-8** | Migrate session storage to SQLite DB & fix CORS origins | Architecture | Medium |
 
 ---
 *Report updated with findings from Automated Code Review Engine.*
