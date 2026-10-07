@@ -4,11 +4,12 @@ import userEvent from "@testing-library/user-event";
 
 import { AINewsPanel } from "@/components/AINewsPanel";
 
-const json = (status: number, body?: unknown) => ({
-  ok: status >= 200 && status < 300,
-  status,
-  json: () => Promise.resolve(body ?? null),
-});
+const json = (status: number, body?: unknown) =>
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    json: () => Promise.resolve(body ?? null),
+  }) as unknown as Response;
 
 beforeEach(() => {
   vi.restoreAllMocks();

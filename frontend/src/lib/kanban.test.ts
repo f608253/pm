@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { cardDndId, columnDndId, moveCard, type Column } from "@/lib/kanban";
 
-const card = (id: number, title = `card ${id}`) => ({ id, title, details: "" });
+const card = (id: number, title = `card ${id}`) => ({ id, title, details: "", priority: "medium" });
 
 const columns = (): Column[] => [
   { id: 1, title: "Backlog", cards: [card(1), card(2)] },
   { id: 2, title: "Review", cards: [card(3)] },
 ];
-
 const titles = (list: Column[], columnId: number) =>
   list.find((column) => column.id === columnId)!.cards.map((c) => c.title);
 

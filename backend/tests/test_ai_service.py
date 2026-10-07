@@ -205,3 +205,215 @@ def test_chat_requires_api_key(monkeypatch):
 
     with pytest.raises(ai.AiNotConfigured):
         ai.chat([{"role": "user", "content": "hi"}])
+
+
+# --- shared board snapshot for service tests ----------------------------------
+
+from app.serializers import board_out  # noqa: E402
+
+
+@pytest.fixture
+def snapshot(db):
+    """A seeded board serialised the same way the endpoints pass it to the AI."""
+    return board_out(db, 1)
+
+
+# --- daily_summary -------------------------------------------------------------
+
+
+def test_daily_summary_calls_simple_chat(monkeypatch, snapshot):
+    captured = []
+
+    def fake_chat(prompt):
+        captured.append(prompt)
+        return "Board is 60% complete."
+
+    monkeypatch.setattr(ai, "simple_chat", fake_chat)
+    assert ai.daily_summary(snapshot) == "Board is 60% complete."
+    assert "Total cards:" in captured[0]
+
+
+# --- card_intelligence ---------------------------------------------------------
+
+
+def test_card_intelligence_sends_json_response(monkeypatch, snapshot):
+    captured = {}
+
+    def fake_chat(messages, **kwargs):
+        captured["messages"] = messages
+        captured["kwargs"] = kwargs
+        return '{"result": "ok", "details": null, "priority": null, "duplicates": []}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.card_intelligence(snapshot, 1, "suggest_priority")
+    assert result == {"result": "ok", "details": None, "priority": None, "duplicates": []}
+    assert captured["kwargs"]["response_format"] == {"type": "json_object"}
+
+
+def test_card_intelligence_uses_duplicate_context(monkeypatch, snapshot):
+    captured = {}
+
+    def fake_chat(messages, **kwargs):
+        captured["prompt"] = messages[-1]["content"]
+        return '{"result": "ok"}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    ai.card_intelligence(snapshot, 1, "detect_duplicates")
+    assert "Compare the card above" in captured["prompt"]
+
+
+def test_card_intelligence_rejects_unknown_card(snapshot):
+    with pytest.raises(ai.AiError, match="not found"):
+        ai.card_intelligence(snapshot, 9999, "suggest_priority")
+
+
+# --- workflow_optimization -----------------------------------------------------
+
+
+def test_workflow_optimization_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return (
+            '{"bottlenecks": [], "next_actions": [], "suggestions": [], "optimal_order": {}}'
+        )
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.workflow_optimization(snapshot)
+    assert result["bottlenecks"] == []
+    assert result["next_actions"] == []
+
+
+def test_workflow_optimization_raises_on_malformed(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return "not json"
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    with pytest.raises(ai.AiError):
+        ai.workflow_optimization(snapshot)
+
+
+# --- sprint_retrospective ------------------------------------------------------
+
+
+def test_sprint_retrospective_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return '{"summary": "ok", "what_went_well": [], "what_to_improve": [], "actions": []}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.sprint_retrospective(snapshot)
+    assert result["summary"] == "ok"
+    assert result["what_went_well"] == []
+
+
+# --- risk_assessment -----------------------------------------------------------
+
+
+def test_risk_assessment_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return '{"summary": "ok", "risks": []}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.risk_assessment(snapshot)
+    assert result["summary"] == "ok"
+    assert result["risks"] == []
+
+
+# --- effort_estimation ---------------------------------------------------------
+
+
+def test_effort_estimation_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return '{"summary": "ok", "estimates": []}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.effort_estimation(snapshot)
+    assert result["summary"] == "ok"
+    assert result["estimates"] == []
+
+
+# --- standup_points ------------------------------------------------------------
+
+
+def test_standup_points_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return '{"summary": "ok", "points": [], "blockers": []}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.standup_points(snapshot)
+    assert result["summary"] == "ok"
+    assert result["points"] == []
+
+
+# --- weekly_report -------------------------------------------------------------
+
+
+def test_weekly_report_returns_parsed_json(monkeypatch, snapshot):
+    def fake_chat(messages, **kwargs):
+        return '{"summary": "ok", "completed": [], "in_progress": [], "up_next": [], "net_worth": ""}'
+
+    monkeypatch.setattr(ai, "chat", fake_chat)
+    result = ai.weekly_report(snapshot)
+    assert result["summary"] == "ok"
+    assert result["completed"] == []
+
+
+# --- extract_json --------------------------------------------------------------
+
+
+def test_extract_json_strips_code_fences():
+    raw = "```json\n{\"result\": \"ok\"}\n```"
+    assert ai.extract_json(raw) == {"result": "ok"}
+
+
+def test_extract_json_rejects_non_json():
+    with pytest.raises(ai.AiError):
+        ai.extract_json("plain text")
+
+
+# --- fetch_ai_news -------------------------------------------------------------
+
+
+def test_fetch_ai_news_parses_rss(monkeypatch):
+    rss = """<?xml version="1.0"?>
+<rss><channel><item>
+<title>AI breaks new ground</title>
+<link>https://example.com/1</link>
+<pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
+</item><item>
+<title>Second story</title>
+<link>https://example.com/2</link>
+<pubDate>Tue, 02 Jan 2024 00:00:00 GMT</pubDate>
+</item></channel></rss>"""
+
+    class FakeResp:
+        status_code = 200
+        text = rss
+
+        def raise_for_status(self):
+            pass
+
+    monkeypatch.setattr(httpx, "get", lambda *a, **k: FakeResp())
+    # The service shuffles the feed; collect titles regardless of order.
+    monkeypatch.setattr(ai.random, "shuffle", lambda x: None)
+    monkeypatch.setattr(ai.random, "sample", lambda population, k: list(population)[:k])
+
+    news = ai.fetch_ai_news()
+    titles = [item["title"] for item in news]
+    assert len(news) == 2
+    assert "AI breaks new ground" in titles
+    assert news[0]["link"] == "https://example.com/1"
+    assert news[1]["title"] == "Second story"
+
+
+def test_fetch_ai_news_empty_feed_returns_empty(monkeypatch):
+    empty_rss = """<?xml version="1.0"?>
+<rss><channel></channel></rss>"""
+
+    class FakeResp:
+        status_code = 200
+        text = empty_rss
+
+        def raise_for_status(self):
+            pass
+
+    monkeypatch.setattr(httpx, "get", lambda *a, **k: FakeResp())
+    assert ai.fetch_ai_news() == []

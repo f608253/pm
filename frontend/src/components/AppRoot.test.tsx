@@ -11,7 +11,7 @@ const board: Board = {
     {
       id: 1,
       title: "Backlog",
-      cards: [{ id: 1, title: "Align roadmap themes", details: "" }],
+      cards: [{ id: 1, title: "Align roadmap themes", details: "", priority: "medium" }],
     },
     { id: 2, title: "Review", cards: [] },
   ],
@@ -75,7 +75,7 @@ describe("AppRoot", () => {
 
   it("sends the stored token when checking the session", async () => {
     window.localStorage.setItem("kanban-studio-token", "stored-token");
-    const fetchMock = vi.fn((url: string) =>
+    const fetchMock = vi.fn((url: string, init?: RequestInit) =>
       Promise.resolve(
         url === "/api/boards"
           ? json(200, [{ id: 1, title: "My Board" }])
@@ -89,7 +89,8 @@ describe("AppRoot", () => {
     render(<AppRoot />);
     await screen.findByText(/signed in as user/i);
 
-    const headers = fetchMock.mock.calls[0][1].headers as Headers;
+    const init = fetchMock.mock.calls[0][1];
+    const headers = (init?.headers ?? new Headers()) as Headers;
     expect(headers.get("Authorization")).toBe("Bearer stored-token");
   });
 

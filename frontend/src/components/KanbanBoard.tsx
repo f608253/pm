@@ -15,6 +15,11 @@ import { ChatSidebar } from "@/components/ChatSidebar";
 import { AINewsPanel } from "@/components/AINewsPanel";
 import { DailySummaryPanel } from "@/components/DailySummaryPanel";
 import { WorkflowPanel } from "@/components/WorkflowPanel";
+import { RiskAssessmentPanel } from "@/components/RiskAssessmentPanel";
+import { EffortEstimationPanel } from "@/components/EffortEstimationPanel";
+import { SprintRetrospectivePanel } from "@/components/SprintRetrospectivePanel";
+import { StandupPanel } from "@/components/StandupPanel";
+import { WeeklyReportPanel } from "@/components/WeeklyReportPanel";
 import { KanbanColumn } from "@/components/KanbanColumn";
 import { KanbanCardPreview } from "@/components/KanbanCardPreview";
 import { moveCard, type Board, type Card } from "@/lib/kanban";
@@ -42,6 +47,11 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
   const [newsOpen, setNewsOpen] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [workflowOpen, setWorkflowOpen] = useState(false);
+  const [riskOpen, setRiskOpen] = useState(false);
+  const [effortOpen, setEffortOpen] = useState(false);
+  const [retroOpen, setRetroOpen] = useState(false);
+  const [standupOpen, setStandupOpen] = useState(false);
+  const [weeklyOpen, setWeeklyOpen] = useState(false);
 
   const renameTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
 
@@ -360,10 +370,15 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
           </DragOverlay>
         </DndContext>
 
-        <ChatSidebar board={board} onBoardChange={setBoard} showToggle={false} />
-        <AINewsPanel open={newsOpen} onClose={() => setNewsOpen(false)} />
-        <DailySummaryPanel open={summaryOpen} onClose={() => setSummaryOpen(false)} boardId={board.id} />
-        <WorkflowPanel open={workflowOpen} onClose={() => setWorkflowOpen(false)} board={board} />
+         <ChatSidebar board={board} onBoardChange={setBoard} showToggle={false} />
+         <AINewsPanel open={newsOpen} onClose={() => setNewsOpen(false)} />
+         <DailySummaryPanel open={summaryOpen} onClose={() => setSummaryOpen(false)} boardId={board.id} />
+         <WorkflowPanel open={workflowOpen} onClose={() => setWorkflowOpen(false)} board={board} />
+         <RiskAssessmentPanel open={riskOpen} onClose={() => setRiskOpen(false)} board={board} />
+         <EffortEstimationPanel open={effortOpen} onClose={() => setEffortOpen(false)} board={board} />
+         <SprintRetrospectivePanel open={retroOpen} onClose={() => setRetroOpen(false)} board={board} />
+         <StandupPanel open={standupOpen} onClose={() => setStandupOpen(false)} board={board} />
+         <WeeklyReportPanel open={weeklyOpen} onClose={() => setWeeklyOpen(false)} board={board} />
         <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
           <button
             type="button"
@@ -394,6 +409,51 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
           </button>
           <button
             type="button"
+            onClick={() => setRiskOpen(true)}
+            aria-expanded={riskOpen}
+            aria-controls="risk-panel"
+            className="rounded-full bg-[var(--primary-blue)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Risk Assessment
+          </button>
+          <button
+            type="button"
+            onClick={() => setEffortOpen(true)}
+            aria-expanded={effortOpen}
+            aria-controls="effort-panel"
+            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Effort Estimate
+          </button>
+          <button
+            type="button"
+            onClick={() => setRetroOpen(true)}
+            aria-expanded={retroOpen}
+            aria-controls="retrospective-panel"
+            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Retrospective
+          </button>
+          <button
+            type="button"
+            onClick={() => setStandupOpen(true)}
+            aria-expanded={standupOpen}
+            aria-controls="standup-panel"
+            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Standup
+          </button>
+          <button
+            type="button"
+            onClick={() => setWeeklyOpen(true)}
+            aria-expanded={weeklyOpen}
+            aria-controls="weekly-report-panel"
+            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
+          >
+            Weekly Report
+          </button>
+          <button
+            type="button"
             onClick={() => {
               const event = new CustomEvent("open-chat");
               window.dispatchEvent(event);
@@ -401,7 +461,7 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
             aria-controls="chat-panel"
             className="rounded-full bg-[var(--accent-yellow)] px-5 py-3 text-sm font-semibold text-[var(--navy-dark)] shadow-[var(--shadow)] transition hover:opacity-90"
           >
-            Chat
+            Ask the assistant
           </button>
         </div>
       </main>

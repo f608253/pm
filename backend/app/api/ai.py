@@ -101,7 +101,7 @@ def chat_with_board(
     if not isinstance(response_text, str) or not response_text.strip():
         raise HTTPException(status_code=502, detail="Model returned no response text")
 
-    applied, skipped = board_ops.apply_operations(db, reply.get("operations"), user)
+    applied, skipped = board_ops.apply_operations(db, reply.get("operations"), user, board_id)
 
     db.add(Message(conversation_id=conversation_id, role="user", content=payload.question))
     db.add(

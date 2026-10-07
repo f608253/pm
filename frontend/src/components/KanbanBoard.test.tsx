@@ -12,11 +12,11 @@ const board: Board = {
       id: 1,
       title: "Backlog",
       cards: [
-        { id: 1, title: "Align roadmap themes", details: "Draft themes." },
-        { id: 2, title: "Gather customer signals", details: "Review tags." },
+        { id: 1, title: "Align roadmap themes", details: "Draft themes.", priority: "medium" },
+        { id: 2, title: "Gather customer signals", details: "Review tags.", priority: "low" },
       ],
     },
-    { id: 2, title: "Review", cards: [{ id: 3, title: "QA interactions", details: "" }] },
+    { id: 2, title: "Review", cards: [{ id: 3, title: "QA interactions", details: "", priority: "high" }] },
   ],
 };
 

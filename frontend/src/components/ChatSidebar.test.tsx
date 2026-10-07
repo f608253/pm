@@ -12,7 +12,7 @@ const board: Board = {
   id: 1,
   title: "My Board",
   columns: [
-    { id: 1, title: "Backlog", cards: [{ id: 1, title: "Align roadmap themes", details: "" }] },
+    { id: 1, title: "Backlog", cards: [{ id: 1, title: "Align roadmap themes", details: "", priority: "medium" }] },
     { id: 2, title: "Done", cards: [] },
   ],
 };
@@ -184,7 +184,7 @@ describe("ChatSidebar", () => {
       ...board,
       columns: [
         { id: 1, title: "Backlog", cards: [] },
-        { id: 2, title: "Done", cards: [{ id: 9, title: "Shipped by AI", details: "" }] },
+        { id: 2, title: "Done", cards: [{ id: 9, title: "Shipped by AI", details: "", priority: "medium" }] },
       ],
     };
     routeFetch(fetchMock, {
@@ -322,7 +322,7 @@ describe("ChatSidebar", () => {
     fireEvent.touchStart(panel, { touches: [{ clientX: 40 }] });
     fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 70 }] });
 
-    expect(screen.getByRole("button", { name: "Close", exact: true })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Close" })).toBeVisible();
   });
 
   it("stays open on a left swipe", async () => {
@@ -332,7 +332,7 @@ describe("ChatSidebar", () => {
     fireEvent.touchStart(panel, { touches: [{ clientX: 200 }] });
     fireEvent.touchEnd(panel, { changedTouches: [{ clientX: 40 }] });
 
-    expect(screen.getByRole("button", { name: "Close", exact: true })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Close" })).toBeVisible();
   });
 
   it("disables Clear when there is nothing to clear", async () => {

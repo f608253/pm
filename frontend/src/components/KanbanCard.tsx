@@ -31,20 +31,20 @@ export const KanbanCard = ({ card, onDelete, onUpdateCard, boardId }: KanbanCard
       ref={setNodeRef}
       style={style}
       className={clsx(
-        "rounded-2xl border border-transparent bg-white px-4 py-4 shadow-[0_12px_24px_rgba(3,33,71,0.08)]",
+        "relative z-10 rounded-2xl border border-transparent bg-white px-4 py-4 shadow-[0_12px_24px_rgba(3,33,71,0.08)]",
         "transition-all duration-150",
         isDragging && "opacity-60 shadow-[0_18px_32px_rgba(3,33,71,0.16)]"
       )}
-      {...attributes}
-      {...listeners}
       data-testid={`card-${card.id}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
-              {card.title}
-            </h4>
+            <div {...attributes} {...listeners} className="cursor-move">
+              <h4 className="font-display text-base font-semibold text-[var(--navy-dark)]">
+                {card.title}
+              </h4>
+            </div>
             <span
               className={clsx(
                 "rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider",

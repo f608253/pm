@@ -33,6 +33,7 @@ def test_add_card_creates_card(db):
         db,
         {"type": "add_card", "column_id": column.id, "title": "Write docs", "details": "Now"},
         user,
+        1,
     )
     db.commit()
     db.expire_all()
@@ -44,7 +45,7 @@ def test_add_card_creates_card(db):
 def test_add_card_defaults_details_to_empty(db):
     column = column_of(db, "Backlog")
 
-    apply_operation(db, {"type": "add_card", "column_id": column.id, "title": "No details"}, user_of(db))
+    apply_operation(db, {"type": "add_card", "column_id": column.id, "title": "No details"}, user_of(db), 1)
     db.commit()
     db.expire_all()
 
@@ -54,19 +55,19 @@ def test_add_card_defaults_details_to_empty(db):
 
 def test_add_card_rejects_unknown_column(db):
     with pytest.raises(OperationRejected, match="unknown column_id"):
-        apply_operation(db, {"type": "add_card", "column_id": 9999, "title": "x"}, user_of(db))
+        apply_operation(db, {"type": "add_card", "column_id": 9999, "title": "x"}, user_of(db), 1)
 
 
 def test_add_card_rejects_missing_title(db):
     column = column_of(db, "Backlog")
     with pytest.raises(OperationRejected, match="title must not be empty"):
-        apply_operation(db, {"type": "add_card", "column_id": column.id, "title": "  "}, user_of(db))
+        apply_operation(db, {"type": "add_card", "column_id": column.id, "title": "  "}, user_of(db), 1)
 
 
 def test_add_card_rejects_non_text_title(db):
     column = column_of(db, "Backlog")
     with pytest.raises(OperationRejected, match="title must be text"):
-        apply_operation(db, {"type": "add_card", "column_id": column.id, "title": 7}, user_of(db))
+        apply_operation(db, {"type": "add_card", "column_id": column.id, "title": 7}, user_of(db), 1)
 
 
 def test_add_card_rejects_non_text_details(db):
@@ -76,6 +77,7 @@ def test_add_card_rejects_non_text_details(db):
             db,
             {"type": "add_card", "column_id": column.id, "title": "ok", "details": 5},
             user_of(db),
+            1,
         )
 
 
@@ -89,8 +91,9 @@ def test_add_card_truncates_long_text(db):
             "title": "T" * 500,
             "details": "D" * 9000,
         },
-        user_of(db),
-    )
+user_of(db),
+            1,
+        )
     db.commit()
     db.expire_all()
 
@@ -107,6 +110,7 @@ def test_edit_card_updates_fields(db):
         db,
         {"type": "edit_card", "card_id": card.id, "title": "Renamed", "details": "New"},
         user,
+        1,
     )
     db.commit()
 
@@ -118,7 +122,7 @@ def test_edit_card_allows_details_only(db):
     user = user_of(db)
     card = column_of(db, "Backlog").cards[0]
 
-    apply_operation(db, {"type": "edit_card", "card_id": card.id, "details": "Only"}, user)
+    apply_operation(db, {"type": "edit_card", "card_id": card.id, "details": "Only"}, user, 1)
     db.commit()
 
     assert reload_card(db, card.id).details == "Only"
@@ -127,12 +131,12 @@ def test_edit_card_allows_details_only(db):
 def test_edit_card_requires_a_change(db):
     card = column_of(db, "Backlog").cards[0]
     with pytest.raises(OperationRejected, match="needs a title, details, or priority"):
-        apply_operation(db, {"type": "edit_card", "card_id": card.id}, user_of(db))
+        apply_operation(db, {"type": "edit_card", "card_id": card.id}, user_of(db), 1)
 
 
 def test_edit_card_updates_priority(db):
     card = column_of(db, "Backlog").cards[0]
-    apply_operation(db, {"type": "edit_card", "card_id": card.id, "priority": "high"}, user_of(db))
+    apply_operation(db, {"type": "edit_card", "card_id": card.id, "priority": "high"}, user_of(db), 1)
     db.commit()
 
     assert reload_card(db, card.id).priority == "high"
@@ -142,13 +146,13 @@ def test_edit_card_rejects_unknown_priority(db):
     card = column_of(db, "Backlog").cards[0]
     with pytest.raises(OperationRejected, match="priority must be"):
         apply_operation(
-            db, {"type": "edit_card", "card_id": card.id, "priority": "urgent"}, user_of(db)
+            db, {"type": "edit_card", "card_id": card.id, "priority": "urgent"}, user_of(db), 1
         )
 
 
 def test_edit_card_rejects_unknown_card(db):
     with pytest.raises(OperationRejected, match="unknown card_id"):
-        apply_operation(db, {"type": "edit_card", "card_id": 9999, "title": "x"}, user_of(db))
+        apply_operation(db, {"type": "edit_card", "card_id": 9999, "title": "x"}, user_of(db), 1)
 
 
 def test_move_card_changes_column(db):
@@ -157,7 +161,8 @@ def test_move_card_changes_column(db):
     target = column_of(db, "Done")
 
     summary = apply_operation(
-        db, {"type": "move_card", "card_id": card.id, "column_id": target.id}, user
+        db, {"type": "move_card", "card_id": card.id, "column_id": target.id}, user,
+        1,
     )
     db.commit()
 
@@ -171,7 +176,8 @@ def test_move_card_honours_position(db):
     target = column_of(db, "Done")
 
     apply_operation(
-        db, {"type": "move_card", "card_id": card.id, "column_id": target.id, "position": 0}, user
+        db, {"type": "move_card", "card_id": card.id, "column_id": target.id, "position": 0}, user,
+        1,
     )
     db.commit()
 
@@ -186,6 +192,7 @@ def test_move_card_rejects_negative_position(db):
             db,
             {"type": "move_card", "card_id": card.id, "column_id": target.id, "position": -1},
             user_of(db),
+            1,
         )
 
 
@@ -197,6 +204,7 @@ def test_move_card_rejects_boolean_position(db):
             db,
             {"type": "move_card", "card_id": card.id, "column_id": target.id, "position": True},
             user_of(db),
+            1,
         )
 
 
@@ -204,7 +212,8 @@ def test_move_card_rejects_unknown_column(db):
     card = column_of(db, "Backlog").cards[0]
     with pytest.raises(OperationRejected, match="unknown column_id"):
         apply_operation(
-            db, {"type": "move_card", "card_id": card.id, "column_id": 9999}, user_of(db)
+            db, {"type": "move_card", "card_id": card.id, "column_id": 9999}, user_of(db),
+            1,
         )
 
 
@@ -214,7 +223,7 @@ def test_delete_card_removes_card(db):
     card_id = card.id
     title = card.title
 
-    summary = apply_operation(db, {"type": "delete_card", "card_id": card_id}, user)
+    summary = apply_operation(db, {"type": "delete_card", "card_id": card_id}, user, 1)
     db.commit()
     db.expire_all()
 
@@ -224,23 +233,24 @@ def test_delete_card_removes_card(db):
 
 def test_delete_card_rejects_unknown_card(db):
     with pytest.raises(OperationRejected, match="unknown card_id"):
-        apply_operation(db, {"type": "delete_card", "card_id": 9999}, user_of(db))
+        apply_operation(db, {"type": "delete_card", "card_id": 9999}, user_of(db), 1)
 
 
 def test_unknown_operation_type_is_rejected(db):
     with pytest.raises(OperationRejected, match="unknown operation type"):
-        apply_operation(db, {"type": "drop_database"}, user_of(db))
+        apply_operation(db, {"type": "drop_database"}, user_of(db), 1)
 
 
 def test_non_dict_operation_is_rejected(db):
     with pytest.raises(OperationRejected, match="must be an object"):
-        apply_operation(db, "add a card", user_of(db))
+        apply_operation(db, "add a card", user_of(db), 1)
 
 
 def test_non_numeric_ids_are_rejected(db):
     with pytest.raises(OperationRejected, match="column_id must be a number"):
         apply_operation(
-            db, {"type": "add_card", "column_id": "backlog", "title": "x"}, user_of(db)
+            db, {"type": "add_card", "column_id": "backlog", "title": "x"}, user_of(db),
+            1,
         )
 
 
@@ -249,7 +259,7 @@ def test_another_users_card_is_not_reachable(db, intruder):
 
     with pytest.raises(OperationRejected, match="unknown card_id"):
         apply_operation(
-            db, {"type": "edit_card", "card_id": card.id, "title": "hijack"}, intruder
+            db, {"type": "edit_card", "card_id": card.id, "title": "hijack"}, intruder, 1
         )
 
 
@@ -258,7 +268,26 @@ def test_another_users_column_is_not_reachable(db, intruder):
 
     with pytest.raises(OperationRejected, match="unknown column_id"):
         apply_operation(
-            db, {"type": "add_card", "column_id": column.id, "title": "hijack"}, intruder
+            db, {"type": "add_card", "column_id": column.id, "title": "hijack"}, intruder, 1
+        )
+
+
+def test_cross_board_column_is_rejected(db):
+    """A column from another board owned by the same user must be rejected."""
+    user = user_of(db)
+    other_board = Board(user_id=user.id, title="Other board")
+    db.add(other_board)
+    db.commit()
+    other_column = Column(board_id=other_board.id, title="Other column", position=0)
+    db.add(other_column)
+    db.commit()
+
+    with pytest.raises(OperationRejected, match="unknown column_id"):
+        apply_operation(
+            db,
+            {"type": "move_card", "card_id": column_of(db, "Backlog").cards[0].id, "column_id": other_column.id},
+            user,
+            1,
         )
 
 
@@ -273,6 +302,7 @@ def test_apply_operations_collects_applied_and_skipped(db):
             {"type": "add_card", "column_id": 9999, "title": "Bad"},
         ],
         user,
+        1,
     )
 
     assert len(applied) == 1
@@ -281,14 +311,14 @@ def test_apply_operations_collects_applied_and_skipped(db):
 
 
 def test_apply_operations_treats_none_as_no_operations(db):
-    assert apply_operations(db, None, user_of(db)) == ([], [])
+    assert apply_operations(db, None, user_of(db), 1) == ([], [])
 
 
 def test_apply_operations_rejects_non_list(db):
     from fastapi import HTTPException
 
     with pytest.raises(HTTPException):
-        apply_operations(db, {"type": "add_card"}, user_of(db))
+        apply_operations(db, {"type": "add_card"}, user_of(db), 1)
 
 
 def test_system_prompt_includes_board_state(db):

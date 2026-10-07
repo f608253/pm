@@ -22,11 +22,11 @@ def _text(value, limit: int, label: str) -> str:
     return cleaned[:limit]
 
 
-def _column(db: Session, column_id, user_id: int) -> Column:
+def _column(db: Session, column_id, user_id: int, board_id: int) -> Column:
     if not isinstance(column_id, int):
         raise OperationRejected("column_id must be a number")
     column = db.get(Column, column_id)
-    if column is None or column.board.user_id != user_id:
+    if column is None or column.board_id != board_id or column.board.user_id != user_id:
         raise OperationRejected(f"unknown column_id {column_id}")
     return column
 
@@ -40,7 +40,7 @@ def _card(db: Session, card_id, user_id: int) -> Card:
     return card
 
 
-def apply_operation(db: Session, op: dict, user: User) -> str:
+def apply_operation(db: Session, op: dict, user: User, board_id: int) -> str:
     """Apply one AI-proposed operation and return a human readable summary.
 
     Raises OperationRejected when the operation is malformed or references
@@ -51,7 +51,7 @@ def apply_operation(db: Session, op: dict, user: User) -> str:
     kind = op.get("type")
 
     if kind == "add_card":
-        column = _column(db, op.get("column_id"), user.id)
+        column = _column(db, op.get("column_id"), user.id, board_id)
         title = _text(op.get("title"), MAX_TITLE, "title")
         details = op.get("details") or ""
         if not isinstance(details, str):
@@ -89,7 +89,7 @@ def apply_operation(db: Session, op: dict, user: User) -> str:
 
     if kind == "move_card":
         card = _card(db, op.get("card_id"), user.id)
-        target = _column(db, op.get("column_id"), user.id)
+        target = _column(db, op.get("column_id"), user.id, board_id)
         position = op.get("position", 0)
         if position is None:
             position = 0
@@ -107,7 +107,7 @@ def apply_operation(db: Session, op: dict, user: User) -> str:
     raise OperationRejected(f"unknown operation type {kind!r}")
 
 
-def apply_operations(db: Session, operations, user: User) -> tuple[list[str], list[str]]:
+def apply_operations(db: Session, operations, user: User, board_id: int) -> tuple[list[str], list[str]]:
     """Apply every operation, collecting applied and skipped summaries."""
     if operations is None:
         return [], []
@@ -118,7 +118,7 @@ def apply_operations(db: Session, operations, user: User) -> tuple[list[str], li
     skipped: list[str] = []
     for op in operations:
         try:
-            applied.append(apply_operation(db, op, user))
+            applied.append(apply_operation(db, op, user, board_id))
         except OperationRejected as err:
             skipped.append(str(err))
     return applied, skipped

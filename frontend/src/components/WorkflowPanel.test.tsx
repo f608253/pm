@@ -21,11 +21,12 @@ const board: Board = {
   ],
 };
 
-const json = (status: number, body?: unknown) => ({
-  ok: status >= 200 && status < 300,
-  status,
-  json: () => Promise.resolve(body ?? null),
-});
+const json = (status: number, body?: unknown) =>
+  ({
+    ok: status >= 200 && status < 300,
+    status,
+    json: () => Promise.resolve(body ?? null),
+  }) as unknown as Response;
 
 const mock = (body: unknown) =>
   vi.spyOn(globalThis, "fetch").mockImplementation(() => Promise.resolve(json(200, body)));
