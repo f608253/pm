@@ -210,4 +210,15 @@ describe("KanbanBoard", () => {
     // Reloaded from the API, so the card comes back.
     expect(await screen.findByText("Align roadmap themes")).toBeInTheDocument();
   });
+
+  it("opens AI analysis panels from the header buttons", async () => {
+    const user = userEvent.setup();
+    mockFetch(baseHandlers());
+    render(<KanbanBoard />);
+    await waitFor(() => expect(screen.getAllByTestId(/column-/i)).toHaveLength(2));
+
+    const riskButtons = screen.getAllByRole("button", { name: /risk assessment/i });
+    await user.click(riskButtons[0]);
+    expect(screen.getByRole("complementary", { name: /risk assessment/i })).toBeInTheDocument();
+  });
 });

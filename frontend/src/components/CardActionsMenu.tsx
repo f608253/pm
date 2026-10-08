@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { cardIntelligence, type CardIntelligenceResult } from "@/lib/api";
 import type { CardIntelligenceRequest } from "@/lib/api";
@@ -28,6 +28,20 @@ export const CardActionsMenu = ({ cardId, boardId, onUpdateCard }: Props) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CardIntelligenceResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [open]);
 
   const run = async (task: CardIntelligenceRequest["task"]) => {
     setOpen(false);
@@ -59,7 +73,7 @@ export const CardActionsMenu = ({ cardId, boardId, onUpdateCard }: Props) => {
   };
 
   return (
-    <div className="relative">
+    <div ref={menuRef} className="relative">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}

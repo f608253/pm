@@ -155,6 +155,27 @@ def test_edit_card_rejects_unknown_card(db):
         apply_operation(db, {"type": "edit_card", "card_id": 9999, "title": "x"}, user_of(db), 1)
 
 
+def test_cross_board_operations_rejected(db):
+    user = user_of(db)
+    # Create a second board owned by the same user
+    board2 = Board(title="Board 2", user_id=user.id)
+    db.add(board2)
+    db.flush()
+    col2 = Column(board_id=board2.id, title="Col 2", position=0)
+    db.add(col2)
+    db.flush()
+    card2 = Card(column_id=col2.id, title="Board2 Card", details="", position=0)
+    db.add(card2)
+    db.commit()
+
+    # Attempting to operate on card2 (board 2) using board_id=1 must be rejected
+    with pytest.raises(OperationRejected, match="unknown card_id"):
+        apply_operation(db, {"type": "edit_card", "card_id": card2.id, "title": "Hacked"}, user, 1)
+
+    with pytest.raises(OperationRejected, match="unknown column_id"):
+        apply_operation(db, {"type": "add_card", "column_id": col2.id, "title": "New"}, user, 1)
+
+
 def test_move_card_changes_column(db):
     user = user_of(db)
     card = column_of(db, "Backlog").cards[0]

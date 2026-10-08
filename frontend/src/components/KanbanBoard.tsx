@@ -123,7 +123,7 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
       setTimeout(() => {
         timers.delete(columnId);
         renameColumnRequest(columnId, title).catch(() =>
-          void fail("Could not rename that column.")
+          void setError("Could not rename that column.")
         );
       }, 400)
     );
@@ -329,16 +329,58 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
               {error}
             </p>
           ) : null}
-          <div className="flex flex-wrap items-center gap-4">
-            {board.columns.map((column) => (
-              <div
-                key={column.id}
-                className="flex items-center gap-2 rounded-full border border-[var(--stroke)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--navy-dark)]"
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-4">
+              {board.columns.map((column) => (
+                <div
+                  key={column.id}
+                  className="flex items-center gap-2 rounded-full border border-[var(--stroke)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--navy-dark)]"
+                >
+                  <span className="h-2 w-2 rounded-full bg-[var(--accent-yellow)]" />
+                  {column.title}
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)] mr-1">
+                AI Analysis:
+              </span>
+              <button
+                type="button"
+                onClick={() => setRiskOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
               >
-                <span className="h-2 w-2 rounded-full bg-[var(--accent-yellow)]" />
-                {column.title}
-              </div>
-            ))}
+                Risk Assessment
+              </button>
+              <button
+                type="button"
+                onClick={() => setEffortOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Effort Estimate
+              </button>
+              <button
+                type="button"
+                onClick={() => setRetroOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Retrospective
+              </button>
+              <button
+                type="button"
+                onClick={() => setStandupOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Standup
+              </button>
+              <button
+                type="button"
+                onClick={() => setWeeklyOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Weekly Report
+              </button>
+            </div>
           </div>
         </header>
 

@@ -31,11 +31,11 @@ def _column(db: Session, column_id, user_id: int, board_id: int) -> Column:
     return column
 
 
-def _card(db: Session, card_id, user_id: int) -> Card:
+def _card(db: Session, card_id, user_id: int, board_id: int) -> Card:
     if not isinstance(card_id, int):
         raise OperationRejected("card_id must be a number")
     card = db.get(Card, card_id)
-    if card is None or card.column.board.user_id != user_id:
+    if card is None or card.column.board_id != board_id or card.column.board.user_id != user_id:
         raise OperationRejected(f"unknown card_id {card_id}")
     return card
 
@@ -66,7 +66,7 @@ def apply_operation(db: Session, op: dict, user: User, board_id: int) -> str:
         return f'Added "{title}" to {column.title}'
 
     if kind == "edit_card":
-        card = _card(db, op.get("card_id"), user.id)
+        card = _card(db, op.get("card_id"), user.id, board_id)
         changed = False
         if op.get("title") is not None:
             card.title = _text(op.get("title"), MAX_TITLE, "title")
@@ -88,7 +88,7 @@ def apply_operation(db: Session, op: dict, user: User, board_id: int) -> str:
         return f'Updated "{card.title}"'
 
     if kind == "move_card":
-        card = _card(db, op.get("card_id"), user.id)
+        card = _card(db, op.get("card_id"), user.id, board_id)
         target = _column(db, op.get("column_id"), user.id, board_id)
         position = op.get("position", 0)
         if position is None:
@@ -99,7 +99,7 @@ def apply_operation(db: Session, op: dict, user: User, board_id: int) -> str:
         return f'Moved "{card.title}" to {target.title}'
 
     if kind == "delete_card":
-        card = _card(db, op.get("card_id"), user.id)
+        card = _card(db, op.get("card_id"), user.id, board_id)
         title = card.title
         db.delete(card)
         return f'Deleted "{title}"'

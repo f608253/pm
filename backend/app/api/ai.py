@@ -118,9 +118,9 @@ def chat_with_board(
 
 
 @router.get("/ai/news", response_model=AiNewsResponse)
-def ai_news(user: CurrentUser) -> AiNewsResponse:
+def ai_news(user: CurrentUser, randomize: bool = False) -> AiNewsResponse:
     try:
-        items = ai.fetch_ai_news()
+        items = ai.fetch_ai_news(randomize=randomize)
     except ai.AiError as err:
         raise HTTPException(status_code=502, detail=str(err))
     return AiNewsResponse(
@@ -230,7 +230,7 @@ def workflow_optimization(
     # ordering, so only keep columns whose list is a permutation of that column.
     # JSON object keys arrive as strings, so coerce before looking them up.
     optimal_order = {}
-    for raw_column_id, order in result.get("optimal_order", {}).items():
+    for raw_column_id, order in (result.get("optimal_order") or {}).items():
         column_id = int(raw_column_id) if str(raw_column_id).isdigit() else raw_column_id
         if (
             column_id in columns

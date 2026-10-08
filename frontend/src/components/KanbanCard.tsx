@@ -17,6 +17,10 @@ const PRIORITY_COLORS: Record<string, string> = {
   low: "bg-green-100 text-green-800 border-green-200",
 };
 
+const stopPropagation = (e: React.MouseEvent) => {
+  e.stopPropagation();
+};
+
 export const KanbanCard = ({ card, onDelete, onUpdateCard, boardId }: KanbanCardProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: cardDndId(card.id) });
@@ -62,7 +66,11 @@ export const KanbanCard = ({ card, onDelete, onUpdateCard, boardId }: KanbanCard
           <CardActionsMenu cardId={card.id} boardId={boardId} onUpdateCard={onUpdateCard} />
           <button
             type="button"
-            onClick={() => onDelete(card.id)}
+            onClick={(e) => {
+              stopPropagation(e);
+              onDelete(card.id);
+            }}
+            onPointerDown={stopPropagation}
             className="rounded-full border border-transparent px-2 py-1 text-xs font-semibold text-[var(--gray-text)] transition hover:border-[var(--stroke)] hover:text-[var(--navy-dark)]"
             aria-label={`Delete ${card.title}`}
           >

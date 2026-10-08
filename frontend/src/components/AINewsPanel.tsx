@@ -17,11 +17,11 @@ export const AINewsPanel = ({ open, onClose }: Props) => {
   const [error, setError] = useState<string | null>(null);
   const touchStartX = useRef<number | null>(null);
 
-  const load = async () => {
+  const load = async (randomize = false) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchAiNews();
+      const data = await fetchAiNews(randomize);
       setItems(data.items);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load AI news.");
@@ -73,7 +73,7 @@ export const AINewsPanel = ({ open, onClose }: Props) => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => void load()}
+            onClick={() => void load(true)}
             disabled={loading}
             className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)] disabled:opacity-40"
           >

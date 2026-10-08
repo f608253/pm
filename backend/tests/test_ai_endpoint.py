@@ -15,7 +15,7 @@ def test_news_returns_items(auth_client, monkeypatch):
     fake_items = [
         {"title": "Test story", "link": "https://example.com/1", "published": "Mon, 01 Jan 2024 00:00:00 GMT"}
     ]
-    monkeypatch.setattr(ai, "fetch_ai_news", lambda: fake_items)
+    monkeypatch.setattr(ai, "fetch_ai_news", lambda randomize=False: fake_items)
 
     response = auth_client.get("/api/ai/news")
 
@@ -24,7 +24,7 @@ def test_news_returns_items(auth_client, monkeypatch):
 
 
 def test_news_provider_error_returns_502(auth_client, monkeypatch):
-    def raise_provider():
+    def raise_provider(randomize=False):
         raise ai.AiError("feed unavailable")
 
     monkeypatch.setattr(ai, "fetch_ai_news", raise_provider)

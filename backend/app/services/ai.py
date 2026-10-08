@@ -568,16 +568,23 @@ def weekly_report(board) -> dict:
 NEWS_FEED_URL = "https://techcrunch.com/category/artificial-intelligence/feed/"
 
 
-def fetch_ai_news() -> list[dict[str, str]]:
+def fetch_ai_news(randomize: bool = False) -> list[dict[str, str]]:
     """Fetch latest AI news from a public RSS feed."""
     headers = {
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
     }
-    response = httpx.get(NEWS_FEED_URL, follow_redirects=True, timeout=10, headers=headers)
-    response.raise_for_status()
+    try:
+        response = httpx.get(NEWS_FEED_URL, follow_redirects=True, timeout=10, headers=headers)
+        response.raise_for_status()
+    except httpx.HTTPError as err:
+        raise AiError(f"Failed to fetch AI news feed: {err}") from err
 
-    root = ET.fromstring(response.text)
+    try:
+        root = ET.fromstring(response.text)
+    except ET.ParseError as err:
+        raise AiError(f"Failed to parse AI news feed XML: {err}") from err
+
     items = root.findall(".//item")
     news: list[dict[str, str]] = []
     for item in items:
@@ -591,5 +598,19 @@ def fetch_ai_news() -> list[dict[str, str]]:
                 "published": (pub_date.text or "").strip(),
             }
         )
-    random.shuffle(news)
-    return random.sample(news, min(3, len(news)))
+
+    # Sort chronologically by publication date (newest first)
+    def parse_pub_date(item: dict[str, str]):
+        try:
+            from email.utils import parsedate_to_datetime
+            return parsedate_to_datetime(item["published"])
+        except Exception:
+            return None
+
+    news.sort(key=lambda x: parse_pub_date(x) or "", reverse=True)
+
+    if randomize:
+        import random
+        random.shuffle(news)
+
+    return news[:3]

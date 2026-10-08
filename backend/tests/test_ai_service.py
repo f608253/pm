@@ -392,16 +392,15 @@ def test_fetch_ai_news_parses_rss(monkeypatch):
             pass
 
     monkeypatch.setattr(httpx, "get", lambda *a, **k: FakeResp())
-    # The service shuffles the feed; collect titles regardless of order.
-    monkeypatch.setattr(ai.random, "shuffle", lambda x: None)
-    monkeypatch.setattr(ai.random, "sample", lambda population, k: list(population)[:k])
-
     news = ai.fetch_ai_news()
     titles = [item["title"] for item in news]
     assert len(news) == 2
     assert "AI breaks new ground" in titles
-    assert news[0]["link"] == "https://example.com/1"
-    assert news[1]["title"] == "Second story"
+    # Articles are sorted chronologically by publication date (newest first)
+    assert news[0]["link"] == "https://example.com/2"
+    assert news[0]["title"] == "Second story"
+    assert news[1]["link"] == "https://example.com/1"
+    assert news[1]["title"] == "AI breaks new ground"
 
 
 def test_fetch_ai_news_empty_feed_returns_empty(monkeypatch):

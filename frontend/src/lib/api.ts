@@ -221,8 +221,8 @@ export function sendChatMessage(boardId: number, question: string) {
   });
 }
 
-export function fetchAiNews() {
-  return request<AiNewsResult>("/api/ai/news");
+export function fetchAiNews(randomize = false) {
+  return request<AiNewsResult>(`/api/ai/news?randomize=${randomize}`);
 }
 
 export function fetchDailySummary(boardId: number) {

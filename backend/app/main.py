@@ -16,7 +16,10 @@ STATIC_DIR = Path(os.environ.get("STATIC_DIR", "/srv/static")).resolve()
 
 
 def run_migrations() -> None:
-    config = Config(str(Path(__file__).resolve().parent.parent / "alembic.ini"))
+    backend_dir = Path(__file__).resolve().parent.parent
+    ini_path = backend_dir / "alembic.ini"
+    config = Config(str(ini_path))
+    config.set_main_option("script_location", str(backend_dir / "migrations"))
     command.upgrade(config, "head")
 
 
@@ -33,10 +36,17 @@ def init_database() -> None:
 
 app = FastAPI(title="Kanban Studio API", version="0.2.0")
 
+allowed_origins_raw = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000",
+)
+allowed_origins = [o.strip() for o in allowed_origins_raw.split(",") if o.strip()]
+allow_credentials = "*" not in allowed_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

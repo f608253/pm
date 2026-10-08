@@ -151,4 +151,20 @@ describe("CardActionsMenu", () => {
 
     expect(screen.queryByText("Nothing overlaps.")).not.toBeInTheDocument();
   });
+
+  it("closes the dropdown menu when clicking outside", async () => {
+    render(
+      <div>
+        <button type="button">Outside element</button>
+        <CardActionsMenu cardId={1} boardId={1} onUpdateCard={() => {}} />
+      </div>
+    );
+
+    await openMenu();
+    expect(screen.getByRole("button", { name: "Generate details" })).toBeVisible();
+
+    await userEvent.click(screen.getByRole("button", { name: "Outside element" }));
+
+    expect(screen.queryByRole("button", { name: "Generate details" })).not.toBeInTheDocument();
+  });
 });
