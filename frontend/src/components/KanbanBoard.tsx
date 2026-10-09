@@ -347,6 +347,27 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
               </span>
               <button
                 type="button"
+                onClick={() => setNewsOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                AI News
+              </button>
+              <button
+                type="button"
+                onClick={() => setSummaryOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Daily Summary
+              </button>
+              <button
+                type="button"
+                onClick={() => setWorkflowOpen(true)}
+                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+              >
+                Workflow
+              </button>
+              <button
+                type="button"
                 onClick={() => setRiskOpen(true)}
                 className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
               >
@@ -421,79 +442,7 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
          <SprintRetrospectivePanel open={retroOpen} onClose={() => setRetroOpen(false)} board={board} />
          <StandupPanel open={standupOpen} onClose={() => setStandupOpen(false)} board={board} />
          <WeeklyReportPanel open={weeklyOpen} onClose={() => setWeeklyOpen(false)} board={board} />
-        <div className="fixed bottom-6 right-6 z-30 flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={() => setNewsOpen(true)}
-            aria-expanded={newsOpen}
-            aria-controls="ai-news-panel"
-            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            AI News
-          </button>
-          <button
-            type="button"
-            onClick={() => setSummaryOpen(true)}
-            aria-expanded={summaryOpen}
-            aria-controls="daily-summary-panel"
-            className="rounded-full bg-[var(--primary-blue)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Daily Summary
-          </button>
-          <button
-            type="button"
-            onClick={() => setWorkflowOpen(true)}
-            aria-expanded={workflowOpen}
-            aria-controls="workflow-panel"
-            className="rounded-full bg-[var(--navy-dark)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Workflow
-          </button>
-          <button
-            type="button"
-            onClick={() => setRiskOpen(true)}
-            aria-expanded={riskOpen}
-            aria-controls="risk-panel"
-            className="rounded-full bg-[var(--primary-blue)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Risk Assessment
-          </button>
-          <button
-            type="button"
-            onClick={() => setEffortOpen(true)}
-            aria-expanded={effortOpen}
-            aria-controls="effort-panel"
-            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Effort Estimate
-          </button>
-          <button
-            type="button"
-            onClick={() => setRetroOpen(true)}
-            aria-expanded={retroOpen}
-            aria-controls="retrospective-panel"
-            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Retrospective
-          </button>
-          <button
-            type="button"
-            onClick={() => setStandupOpen(true)}
-            aria-expanded={standupOpen}
-            aria-controls="standup-panel"
-            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Standup
-          </button>
-          <button
-            type="button"
-            onClick={() => setWeeklyOpen(true)}
-            aria-expanded={weeklyOpen}
-            aria-controls="weekly-report-panel"
-            className="rounded-full bg-[var(--secondary-purple)] px-5 py-3 text-sm font-semibold text-white shadow-[var(--shadow)] transition hover:opacity-90"
-          >
-            Weekly Report
-          </button>
+        <div className="fixed bottom-6 right-6 z-30">
           <button
             type="button"
             onClick={() => {

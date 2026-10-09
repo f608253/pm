@@ -76,7 +76,11 @@ export const CardActionsMenu = ({ cardId, boardId, onUpdateCard }: Props) => {
     <div ref={menuRef} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((prev) => !prev);
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
         disabled={loading}
         aria-expanded={open}
         aria-label="Card AI actions"
