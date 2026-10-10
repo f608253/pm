@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Studio - Master Architecture, System Design & Operations Guide</title>
+  <style>
+    :root {
+      --navy-dark: #031836;
+      --navy-card: #08264d;
+      --navy-light: #0d3870;
+      --navy-hover: #124587;
+      --primary-blue: #209dd7;
+      --primary-blue-glow: rgba(32, 157, 215, 0.35);
+      --secondary-purple: #9333ea;
+      --accent-yellow: #f5b800;
+      --accent-yellow-glow: rgba(245, 184, 0, 0.3);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-subdued: #64748b;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --border-bright: rgba(32, 157, 215, 0.4);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--navy-dark);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: rgba(3, 24, 54, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--accent-yellow) 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px var(--accent-yellow-glow);
+    }
+
+    .logo-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 0.65rem 1rem 0.65rem 2.5rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 12px var(--primary-blue-glow);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Layout */
+    .app-layout {
+      display: flex;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* Sidebar Navigation */
+    sidebar {
+      width: 320px;
+      padding: 1.5rem 1rem 2rem 2rem;
+      border-right: 1px solid var(--border-color);
+      position: sticky;
+      top: 73px;
+      height: calc(100vh - 73px);
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    .toc-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-subdued);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .toc-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .toc-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.85rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .toc-link:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .toc-link.active {
+      color: var(--primary-blue);
+      background: rgba(32, 157, 215, 0.12);
+      border-left: 3px solid var(--primary-blue);
+      font-weight: 600;
+    }
+
+    .toc-number {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-subdued);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    /* Main Content Area */
+    main {
+      flex: 1;
+      padding: 2rem 3rem 4rem 3rem;
+      min-width: 0;
+    }
+
+    .section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 90px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--accent-yellow);
+      background: rgba(245, 184, 0, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid rgba(245, 184, 0, 0.25);
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 1rem;
+      letter-spacing: -0.5px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--primary-blue);
+      margin: 1.5rem 0 0.75rem 0;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      font-size: 0.98rem;
+    }
+
+    /* Grid Layouts & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0;
+    }
+
+    /* Data Tables */
+    .table-container {
+      overflow-x: auto;
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      margin: 1.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      font-weight: 600;
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-main);
+    }
+
+    /* Method Badges */
+    .method {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .method.get { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .method.post { background: rgba(32, 157, 215, 0.15); color: #60a5fa; border: 1px solid rgba(32, 157, 215, 0.3); }
+    .method.patch { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .method.delete { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Code Blocks */
+    pre {
+      background: #020d1f;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin: 1.25rem 0;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent-yellow);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* ASCII Visual Diagrams */
+    .diagram-block {
+      background: #010915;
+      border: 1px solid var(--border-bright);
+      border-radius: 12px;
+      padding: 1.5rem;
+      color: var(--primary-blue);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      white-space: pre;
+      overflow-x: auto;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      margin: 1.5rem 0;
+    }
+
+    /* Highlights & Callouts */
+    .callout {
+      background: rgba(32, 157, 215, 0.08);
+      border-left: 4px solid var(--primary-blue);
+      border-radius: 0 8px 8px 0;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      font-size: 0.92rem;
+    }
+
+    /* Footer */
+    footer {
+      background: rgba(3, 24, 54, 0.95);
+      border-top: 1px solid var(--border-color);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-subdued);
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+
+    @media (max-width: 1024px) {
+      .app-layout { flex-direction: column; }
+      sidebar { width: 100%; height: auto; position: relative; top: 0; border-right: none; border-bottom: 1px solid var(--border-color); padding: 1.5rem; }
+      main { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="header-container">
+      <div class="logo-area">
+        <span class="logo-badge">ENTERPRISE GUIDE</span>
+        <span class="logo-title">Kanban Studio Master Architecture</span>
+      </div>
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search architecture, APIs, database, AI tools..." onkeyup="filterContent()">
+      </div>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-layout">
+
+    <!-- Sticky Table of Contents -->
+    <sidebar>
+      <div class="toc-title">Documentation Map</div>
+      <nav class="toc-nav">
+        <a href="#sec-summary" class="toc-link active"><span class="toc-number">01</span> Executive Summary</a>
+        <a href="#sec-techstack" class="toc-link"><span class="toc-number">02</span> Tech Stack Matrix</a>
+        <a href="#sec-database" class="toc-link"><span class="toc-number">03</span> Database ER Schema</a>
+        <a href="#sec-api" class="toc-link"><span class="toc-number">04</span> REST API Specification</a>
+        <a href="#sec-ai" class="toc-link"><span class="toc-number">05</span> AI Operations Engine</a>
+        <a href="#sec-frontend" class="toc-link"><span class="toc-number">06</span> Frontend & Drag-Drop</a>
+        <a href="#sec-uimap" class="toc-link"><span class="toc-number">07</span> Visual Interface Map</a>
+        <a href="#sec-structure" class="toc-link"><span class="toc-number">08</span> Directory Structure</a>
+        <a href="#sec-ops" class="toc-link"><span class="toc-number">09</span> Build & Test Pipeline</a>
+        <a href="#sec-security" class="toc-link"><span class="toc-number">10</span> Security & Reliability</a>
+      </nav>
+    </sidebar>
+
+    <!-- Main Documentation Canvas -->
+    <main>
+
+      <!-- Section 1: Executive Summary -->
+      <section id="sec-summary" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 01</span>
+          <h2>Executive Summary & Core Platform Vision</h2>
+        </div>
+        <p><strong>Kanban Studio</strong> is an enterprise-grade, AI-native single-board project management platform. Designed around a single, highly refined Kanban board paradigm, Kanban Studio provides zero-latency drag-and-drop workflow tracking alongside an AI co-pilot powered by Large Language Models via OpenRouter (<code>openai/gpt-oss-120b</code>).</p>
+
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-title">🚀 Static Export & Fast Mount</div>
+            <p class="card-desc">Next.js 15 exports static HTML/JS/CSS assets (<code>output: 'export'</code>) served directly by FastAPI from <code>/srv/static</code>. Zero Node.js runtime container overhead.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">⚡ AnyIO Threadpool Execution</div>
+            <p class="card-desc">Synchronous FastAPI route handlers execute in AnyIO worker threads, isolating blocking SQLite disk I/O from Python's asyncio event loop.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">🤖 Transactional AI Engine</div>
+            <p class="card-desc">LLM interprets natural language queries into structured JSON mutations (<code>add_card</code>, <code>edit_card</code>, <code>move_card</code>, <code>delete_card</code>) verified with ownership rules.</p>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-title">💡 Deterministic Positional Re-indexing Algorithm</div>
+          <p>Columns and cards maintain explicit integer <code>position</code> fields. Every mutation automatically re-indexes items sequentially (0, 1, 2...) to eliminate index gaps and guarantee deterministic visual ordering across sessions.</p>
+        </div>
+      </section>
+
+      <!-- Section 2: Tech Stack Matrix -->
+      <section id="sec-techstack" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 02</span>
+          <h2>Technology Stack & Architectural Decision Matrix</h2>
+        </div>
+
+        <h3>2.1 Frontend Engineering</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Selected Technology</th>
+                <th>Rationale & Engineering Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Framework</strong></td>
+                <td>Next.js 15 (App Router)</td>
+                <td>Static Export (<code>output: 'export'</code>) places pre-rendered HTML/JS into <code>/srv/static</code>. Zero Node.js runtime memory consumption in production containers.</td>
+              </tr>
+              <tr>
+                <td><strong>UI Runtime</strong></td>
+                <td>React 19 & TypeScript</td>
+                <td>Guarantees strict end-to-end type safety across board models, API payload trees, component props, and drag events.</td>
+              </tr>
+              <tr>
+                <td><strong>Drag & Drop</strong></td>
+                <td>@dnd-kit (Core & Sortable)</td>
+                <td>Calibrated <code>PointerSensor</code> with 6px drag activation constraint. Uses prefix namespacing (<code>c{id}</code> columns, <code>d{id}</code> cards) to prevent ID collisions.</td>
+              </tr>
+              <tr>
+                <td><strong>Styling</strong></td>
+                <td>Tailwind CSS</td>
+                <td>Dark glassmorphism palette using custom theme CSS variables (<code>--navy-dark</code>, <code>--primary-blue</code>, <code>--accent-yellow</code>).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>2.2 Backend & Database Architecture</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Selected Technology</th>
+                <th>Rationale & Engineering Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>API Engine</strong></td>
+                <td>FastAPI (Python 3.11+)</td>
+                <td>Sync route handlers (<code>def</code>) running in AnyIO threadpool avoid async ORM driver overhead and SQLite disk lock contention.</td>
+              </tr>
+              <tr>
+                <td><strong>ORM Layer</strong></td>
+                <td>SQLAlchemy 2.0</td>
+                <td>Explicit <code>selectinload</code> trees build complete Pydantic model responses before returning, completely eliminating <code>DetachedInstanceError</code>.</td>
+              </tr>
+              <tr>
+                <td><strong>Database</strong></td>
+                <td>Embedded SQLite 3</td>
+                <td>Stored at <code>./data/kanban.db</code>. Foreign key constraints enforced on every connection via SQLAlchemy <code>PRAGMA foreign_keys=ON</code> listener.</td>
+              </tr>
+              <tr>
+                <td><strong>Authentication</strong></td>
+                <td>PBKDF2-SHA256 & Bearer Tokens</td>
+                <td>600,000 hashing iterations with 16-byte random salts. 32-byte URL-safe session bearer tokens stored in memory.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 3: Database ER Schema -->
+      <section id="sec-database" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 03</span>
+          <h2>Database Entity-Relationship (ER) Schema</h2>
+        </div>
+
+        <div class="diagram-block">
+┌────────────────────────────────┐       ┌────────────────────────────────┐
+│             users              │       │            sessions            │
+├────────────────────────────────┤       ├────────────────────────────────┤
+│ PK  id             INTEGER     │◄──────┼ FK  user_id        INTEGER     │
+│     username       VARCHAR(64) │ (1:N) │ PK  token          VARCHAR(64) │
+│     password_hash  VARCHAR(128)│       │     created_at     DATETIME    │
+└───────────────┬────────────────┘       └────────────────────────────────┘
+                │
+                │ (1:1 per owner)
+                ▼
+┌────────────────────────────────┐       ┌────────────────────────────────┐
+│             boards             │       │         conversations          │
+├────────────────────────────────┤       ├────────────────────────────────┤
+│ PK  id             INTEGER     │◄──────┼ PK  id             INTEGER     │
+│ FK  user_id        INTEGER     │ (1:N) │ FK  board_id       INTEGER     │
+│     title          VARCHAR(120)│       │     created_at     DATETIME    │
+└───────────────┬────────────────┘       └──────────────┬─────────────────┘
+                │                                       │ (1:N)
+                │ (1:N)                                 ▼
+                ▼                        ┌────────────────────────────────┐
+┌────────────────────────────────┐       │            messages            │
+│            columns             │       ├────────────────────────────────┤
+├────────────────────────────────┤       │ PK  id             INTEGER     │
+│ PK  id             INTEGER     │       │ FK  conversation_id INTEGER    │
+│ FK  board_id       INTEGER     │       │     role           VARCHAR(16) │
+│     title          VARCHAR(120)│       │     content        TEXT        │
+│     position       INTEGER     │       └────────────────────────────────┘
+└───────────────┬────────────────┘
+                │ (1:N)
+                ▼
+┌────────────────────────────────┐
+│             cards              │
+├────────────────────────────────┤
+│ PK  id             INTEGER     │
+│ FK  column_id      INTEGER     │
+│     title          VARCHAR(200)│
+│     details        TEXT        │
+│     position       INTEGER     │
+│     priority       VARCHAR(16) │
+└────────────────────────────────┘
+        </div>
+      </section>
+
+      <!-- Section 4: REST API Specification -->
+      <section id="sec-api" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 04</span>
+          <h2>Complete REST API Endpoints Specification</h2>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint Path</th>
+                <th>Auth Required</th>
+                <th>Request Body / Parameters</th>
+                <th>Response Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/auth/register</code></td>
+                <td>No</td>
+                <td><code>{username, password}</code></td>
+                <td>Creates user, seeds default board/columns, returns token.</td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/auth/login</code></td>
+                <td>No</td>
+                <td><code>{username, password}</code></td>
+                <td>Validates credentials, returns bearer session token.</td>
+              </tr>
+              <tr>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/boards/me</code></td>
+                <td>Bearer Token</td>
+                <td>None</td>
+                <td>Returns user's board with eager-loaded columns & cards.</td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/columns</code></td>
+                <td>Bearer Token</td>
+                <td><code>{board_id, title}</code></td>
+                <td>Appends new column to the right of the board.</td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/cards</code></td>
+                <td>Bearer Token</td>
+                <td><code>{column_id, title, details, priority}</code></td>
+                <td>Creates new card in target column.</td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/cards/{id}/move</code></td>
+                <td>Bearer Token</td>
+                <td><code>{column_id, position}</code></td>
+                <td>Moves card to target column and index with re-indexing.</td>
+              </tr>
+              <tr>
+                <td><span class="method post">POST</span></td>
+                <td><code>/api/ai/chat</code></td>
+                <td>Bearer Token</td>
+                <td><code>{board_id, message}</code></td>
+                <td>Sends query to LLM, executes transactional board mutations.</td>
+              </tr>
+              <tr>
+                <td><span class="method get">GET</span></td>
+                <td><code>/api/ai/news</code></td>
+                <td>Bearer Token</td>
+                <td><code>?randomize=true</code></td>
+                <td>Fetches and parses TechCrunch AI RSS feed items.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 5: AI Operations Engine -->
+      <section id="sec-ai" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 05</span>
+          <h2>AI Operations Engine & 10-Tool Productivity Suite</h2>
+        </div>
+
+        <p>The AI system integrates 10 high-value productivity tools powered by OpenRouter (<code>openai/gpt-oss-120b</code>):</p>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">📊 Board-Wide Header Tools</div>
+            <p class="card-desc">
+              • <strong>Daily Summary</strong>: Progress metrics & actionable suggestions.<br>
+              • <strong>Workflow Optimization</strong>: Bottlenecks, next actions & optimal order.<br>
+              • <strong>Risk Assessment</strong>: Identifies delivery risks in pending work.<br>
+              • <strong>Effort Estimation</strong>: Assigns T-shirt sizes (S, M, L) with hints.<br>
+              • <strong>Sprint Retrospective</strong>: What went well & process action items.<br>
+              • <strong>Daily Standup</strong>: First-person talking points & blockers.<br>
+              • <strong>Weekly Progress Report</strong>: Net impact and work categorisation.<br>
+              • <strong>AI Tech News RSS</strong>: Live industry news with randomization.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-title">🎴 Per-Card Intelligence Badge</div>
+            <p class="card-desc">
+              • <strong>Generate Details</strong>: Drafts structured Markdown specs with checkable Acceptance Criteria.<br>
+              • <strong>Suggest Priority</strong>: Evaluates title/details to recommend high, medium, or low priority.<br>
+              • <strong>Detect Duplicates</strong>: Scans entire board to flag material overlap or exact duplicates.
+            </p>
+          </div>
+        </div>
+
+        <h3>Sample AI Transactional Mutation Payload</h3>
+        <pre><code>{
+  "response": "I have added the security audit task and moved the bug fix card.",
+  "operations": [
+    {
+      "type": "add_card",
+      "column_id": 1,
+      "title": "Perform Security Audit",
+      "details": "Review OWASP Top 10 risks",
+      "priority": "high"
+    },
+    {
+      "type": "move_card",
+      "card_id": 14,
+      "column_id": 2,
+      "position": 0
+    }
+  ]
+}</code></pre>
+      </section>
+
+      <!-- Section 6: Frontend Architecture -->
+      <section id="sec-frontend" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 06</span>
+          <h2>Frontend UI & Drag-and-Drop State Machine</h2>
+        </div>
+
+        <div class="diagram-block">
+AppRoot (Auth Gate)
+├── LoginForm (Rendered if bearer token missing)
+└── KanbanBoard (Main Canvas)
+    ├── Header AI Analysis Toolbar (8 Header Modal Triggers)
+    ├── Column Canvas (@dnd-kit Horizontal Container)
+    │   └── KanbanColumn (Sortable Context `c{id}`)
+    │       └── KanbanCard (Sortable Item `d{id}`)
+    │           └── CardActionsMenu (Per-card [AI] Badge Modal)
+    ├── ChatSidebar Drawer ("Ask the assistant" floating button)
+    └── Active AI Tool Modals Manager
+        </div>
+      </section>
+
+      <!-- Section 7: Visual Interface Map -->
+      <section id="sec-uimap" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 07</span>
+          <h2>Visual Application Interface Layout</h2>
+        </div>
+
+        <div class="diagram-block">
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│ KANBAN STUDIO  [Single Board Kanban]                       [ Signed in as User | Log out ] │
+│                                                                                             │
+│  AI Analysis: [AI News] [Daily Summary] [Workflow] [Risk Assessment] [Effort Estimate]      │
+│               [Retrospective] [Standup] [Weekly Report]                                    │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌──────────┐ │
+│ │ TO DO       (+) │ │ IN PROGRESS (+) │ │ REVIEW      (+) │ │ TESTING     (+) │ │ DONE (+) │ │
+│ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├──────────┤ │
+│ │ Card Title      │ │ Card Title      │ │ Card Title      │ │ Card Title      │ │ Card...  │ │
+│ │ [AI] [P: High]  │ │ [AI] [P: Med]   │ │ [AI] [P: Low]   │ │ [AI]            │ │          │ │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────────────┘ └──────────┘ │
+│                                                                          ┌──────────────────┐ │
+│                                                                          │ Ask the assistant│ │
+│                                                                          └──────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+        </div>
+      </section>
+
+      <!-- Section 8: Directory Structure -->
+      <section id="sec-structure" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 08</span>
+          <h2>Directory & File Structure Matrix</h2>
+        </div>
+
+        <pre><code>D:\code\claude\pm\
+├── .env / .env.example              # Environment variables (OPENROUTER_API_KEY)
+├── Dockerfile                       # Multi-stage production container build
+├── docker-compose.yml               # Local container orchestration file
+├── scripts/                         # Control scripts (start.sh, stop.sh, test.sh)
+├── data/kanban.db                   # SQLite production database file
+├── backend/
+│   ├── app/
+│   │   ├── main.py                  # FastAPI app entry point & static mount
+│   │   ├── models.py                # SQLAlchemy ORM database models
+│   │   ├── serializers.py           # Explicit ORM response tree builders
+│   │   ├── kanban.py                # Positional re-indexing domain logic
+│   │   ├── api/                     # REST API Route Handlers
+│   │   └── services/                # OpenRouter AI & Board Operations logic
+│   └── tests/                       # Pytest Test Suite (80%+ Coverage)
+└── frontend/
+    ├── next.config.ts               # Next.js static export (`output: 'export'`) config
+    ├── src/components/              # React UI Component Library
+    └── src/lib/                     # API client & optimistic state mutators</code></pre>
+      </section>
+
+      <!-- Section 9: Build Pipeline -->
+      <section id="sec-ops" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 09</span>
+          <h2>Container Build Pipeline & Test Automation</h2>
+        </div>
+
+        <h3>Container Startup Commands</h3>
+        <pre><code># Start containerized application (Served at http://localhost:8000)
+./scripts/start.sh     # Unix / macOS
+.\scripts\start.ps1    # Windows PowerShell
+
+# Run Pytest, Vitest, and E2E Test Suites
+./scripts/test.sh      # Unix / macOS
+.\scripts\test.ps1     # Windows PowerShell</code></pre>
+      </section>
+
+      <!-- Section 10: Security & Reliability -->
+      <section id="sec-security" class="section">
+        <div class="section-header">
+          <span class="section-tag">SECTION 10</span>
+          <h2>Security Hardening & Reliability Matrix</h2>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">🔒 Security Architecture</div>
+            <p class="card-desc">
+              • PBKDF2-SHA256 password hashing with 600,000 iterations & 16-byte random salts.<br>
+              • 32-byte URL-safe cryptographic session bearer tokens.<br>
+              • Explicit ownership checks on every database query preventing cross-user data leakage.<br>
+              • Parameterized ORM queries preventing SQL injection attacks.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-title">🛡️ Reliability & Failover</div>
+            <p class="card-desc">
+              • Exponential backoff retries (up to 3 attempts) on OpenRouter AI calls.<br>
+              • Transactional database rollback when AI operations fail verification.<br>
+              • Foreign key enforcement listeners active on every SQLite connection.<br>
+              • Automated positional re-indexing preventing visual card gaps.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Kanban Studio Master Architecture Guide &bull; Generated for Enterprise Production Deployment
+  </footer>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    function filterContent() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const sections = document.querySelectorAll('.section');
+
+      sections.forEach(section => {
+        const text = section.innerText.toLowerCase();
+        if (text.includes(query)) {
+          section.style.display = 'block';
+        } else {
+          section.style.display = 'none';
+        }
+      });
+    }
+
+    // Highlight active section in TOC on scroll
+    window.addEventListener('scroll', () => {
+      const sections = document.querySelectorAll('.section');
+      const navLinks = document.querySelectorAll('.toc-link');
+
+      let currentSection = '';
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop - 120;
+        if (window.scrollY >= sectionTop) {
+          currentSection = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + currentSection) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Studio - Enterprise Architecture & Interactive Working Guide (Optimized)</title>
+  <style>
+    :root {
+      --navy-dark: #031836;
+      --navy-card: #08264d;
+      --navy-light: #0d3870;
+      --navy-hover: #124587;
+      --primary-blue: #209dd7;
+      --primary-blue-glow: rgba(32, 157, 215, 0.35);
+      --secondary-purple: #9333ea;
+      --accent-yellow: #f5b800;
+      --accent-yellow-glow: rgba(245, 184, 0, 0.3);
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-subdued: #64748b;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --border-bright: rgba(32, 157, 215, 0.4);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--navy-dark);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: rgba(3, 24, 54, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 1rem 2rem;
+    }
+
+    .header-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--accent-yellow) 0%, #d97706 100%);
+      color: #000;
+      font-weight: 800;
+      padding: 0.35rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      box-shadow: 0 0 12px var(--accent-yellow-glow);
+    }
+
+    .logo-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, var(--primary-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 450px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      padding: 0.65rem 1rem 0.65rem 2.6rem;
+      border-radius: 20px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary-blue);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 16px var(--primary-blue-glow);
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      fill: var(--text-muted);
+    }
+
+    .quick-stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* Navigation Tabs */
+    nav {
+      background: var(--navy-card);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-tabs {
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      list-style: none;
+      padding: 0 2rem;
+    }
+
+    .nav-tabs li {
+      padding: 1rem 1.4rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-tabs li:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .nav-tabs li.active {
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
+      background: rgba(32, 157, 215, 0.1);
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1440px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Cards Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(620px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-blue { background: rgba(32, 157, 215, 0.18); color: var(--primary-blue); border: 1px solid var(--primary-blue); }
+    .badge-purple { background: rgba(147, 51, 234, 0.18); color: #c084fc; border: 1px solid var(--secondary-purple); }
+    .badge-green { background: rgba(16, 185, 129, 0.18); color: var(--success); border: 1px solid var(--success); }
+    .badge-yellow { background: rgba(245, 184, 0, 0.18); color: var(--accent-yellow); border: 1px solid var(--accent-yellow); }
+
+    /* Tables */
+    .table-container {
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 1rem 1.2rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: top;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.45);
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      color: var(--accent-yellow);
+      font-size: 0.85rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      margin-top: 0.75rem;
+    }
+
+    /* Flow Stepper */
+    .flow-stepper {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.4rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .flow-step:hover {
+      border-color: var(--border-bright);
+    }
+
+    .flow-step-num {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, #0284c7 100%);
+      color: #fff;
+      font-weight: 800;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px var(--primary-blue-glow);
+    }
+
+    .flow-step-content {
+      flex: 1;
+    }
+
+    .flow-step-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .flow-step-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ER Diagram Box */
+    .er-box {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-family: var(--font-mono);
+      color: #7dd3fc;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.4;
+      font-size: 0.85rem;
+    }
+
+    footer {
+      background: var(--navy-card);
+      border-top: 1px solid var(--border-color);
+      padding: 1.8rem;
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+      <div class="logo-area">
+        <span class="logo-badge">OPTIMIZED</span>
+        <span class="logo-title">Kanban Studio Architecture & System Guide</span>
+      </div>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input type="text" id="searchInput" placeholder="Search functions, components, API routes, schemas..." onkeyup="filterContent()">
+      </div>
+      <div class="quick-stats">
+        <div class="stat-item">API Routes: <span class="stat-value">25+</span></div>
+        <div class="stat-item">AI Tools: <span class="stat-value">9 Suite</span></div>
+        <div class="stat-item">Engine: <span class="stat-value">FastAPI + SSG</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav>
+    <ul class="nav-tabs">
+      <li class="active" onclick="switchTab(event, 'stack')">🚀 System Architecture</li>
+      <li onclick="switchTab(event, 'schema')">🗄️ Database & ERD</li>
+      <li onclick="switchTab(event, 'files')">📁 Manifest Breakdown</li>
+      <li onclick="switchTab(event, 'functions')">⚡ Functions Reference</li>
+      <li onclick="switchTab(event, 'flows')">🔄 System Workflows</li>
+      <li onclick="switchTab(event, 'api')">🔌 REST API Matrix</li>
+      <li onclick="switchTab(event, 'ai')">🤖 AI Co-Pilot Suite</li>
+    </ul>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- TAB 1: SYSTEM ARCHITECTURE -->
+    <div id="stack" class="tab-content active">
+      <h2 class="section-title">System Architecture & Engineering Decisions</h2>
+      <p class="section-subtitle">Deep dive into the architectural principles powering Kanban Studio's performance, stability, and AI integration.</p>
+
+      <div class="grid-3">
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">Frontend: Next.js 15 SSG</span>
+            <span class="badge badge-blue">Export Target</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            <strong>Single-Container Static Export:</strong> Next.js is configured with <code>output: 'export'</code> in <code>next.config.ts</code>. The build produces plain HTML, JS, and CSS files in <code>/srv/static</code>, which FastAPI serves directly.
+          </p>
+          <ul style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem;">
+            <li>Zero Node.js runtime memory overhead in production container.</li>
+            <li>@dnd-kit PointerSensor with 6px drag activation threshold.</li>
+            <li>Namespaced DnD IDs (<code>c{id}</code> and <code>d{id}</code>) preventing ID conflicts.</li>
+            <li>Optimistic React state updates with zero-latency drag updates.</li>
+          </ul>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">Backend: FastAPI Sync Threadpool</span>
+            <span class="badge badge-purple">anyio Threadpool</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            <strong>Non-Blocking Threadpool Handlers:</strong> Route handlers are declared using standard <code>def</code> (synchronous), executing in FastAPI's background <code>anyio</code> worker threads. This isolates blocking SQLite disk I/O without blocking the asyncio loop.
+          </p>
+          <ul style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem;">
+            <li>SQLAlchemy 2.0 Declarative Mapped models.</li>
+            <li>Explicit <code>selectinload</code> eager loading preventing <code>DetachedInstanceError</code>.</li>
+            <li>PBKDF2-SHA256 password hashing with 600,000 iterations.</li>
+            <li>In-memory bearer session store mapping tokens to users.</li>
+          </ul>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">Database: SQLite + Foreign Keys</span>
+            <span class="badge badge-green">PRAGMA Hook</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            <strong>Relational SQLite Integrity:</strong> SQLite stores data in <code>/data/kanban.db</code>. An engine connection event listener executes <code>PRAGMA foreign_keys=ON</code> on every connect.
+          </p>
+          <ul style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); padding-left: 1.2rem;">
+            <li>Alembic migration pipeline resolving schema updates.</li>
+            <li>Sequential positional re-indexing (0, 1, 2...) for cards & columns.</li>
+            <li>Cascading deletes (<code>ON DELETE CASCADE</code>) on parent records.</li>
+            <li>Zero-configuration file persistence.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DATABASE & ERD -->
+    <div id="schema" class="tab-content">
+      <h2 class="section-title">Database Model & ER Diagram</h2>
+      <p class="section-subtitle">Entity-Relationship structure, table definitions, and index rules.</p>
+
+      <div class="er-box">
++----------------------------------------------------+
+|                       USERS                        |
++----------------------------------------------------+
+| id             : INTEGER (PK, AutoIncrement)       |
+| username       : VARCHAR(64) (UNIQUE, NOT NULL)    |
+| password_hash  : VARCHAR(255) (NOT NULL)           |
+| created_at     : DATETIME (DEFAULT CurrentTime)    |
++----------------------------------------------------+
+                          | 1
+                          | N (CASCADE DELETE)
++----------------------------------------------------+
+|                       BOARDS                       |
++----------------------------------------------------+
+| id             : INTEGER (PK, AutoIncrement)       |
+| user_id        : INTEGER (FK -> users.id, INDEX)   |
+| title          : VARCHAR(120) (NOT NULL)           |
+| created_at     : DATETIME (DEFAULT CurrentTime)    |
+| updated_at     : DATETIME (DEFAULT CurrentTime)    |
++----------------------------------------------------+
+          | 1                                 | 1
+          | N (CASCADE DELETE)                | N (CASCADE DELETE)
++------------------------+   +------------------------+
+|        COLUMNS         |   |     CONVERSATIONS      |
++------------------------+   +------------------------+
+| id         : INTEGER   |   | id         : INTEGER   |
+| board_id   : INTEGER   |   | board_id   : INTEGER   |
+| title      : VARCHAR   |   | created_at : DATETIME  |
+| position   : INTEGER   |   +------------------------+
+| created_at : DATETIME  |                | 1
+| updated_at : DATETIME  |                | N (CASCADE DELETE)
++------------------------+   +------------------------+
+          | 1                |        MESSAGES        |
+          | N (CASCADE)      +------------------------+
++------------------------+   | id             : INT   |
+|         CARDS          |   | conversation_id: INT   |
++------------------------+   | role           : STR   |
+| id         : INTEGER   |   | content        : TEXT  |
+| column_id  : INTEGER   |   | created_at     : TIME  |
+| title      : VARCHAR   |   +------------------------+
+| details    : TEXT      |
+| priority   : VARCHAR   |
+| position   : INTEGER   |
+| created_at : DATETIME  |
+| updated_at : DATETIME  |
++------------------------+
+      </div>
+    </div>
+
+    <!-- TAB 3: MANIFEST BREAKDOWN -->
+    <div id="files" class="tab-content">
+      <h2 class="section-title">Comprehensive Codebase Manifest</h2>
+      <p class="section-subtitle">Full inventory of backend modules, frontend components, services, and libraries.</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>File Path</th>
+              <th>Layer</th>
+              <th>Primary Role & Responsibilities</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="search-target">
+              <td><code>backend/app/main.py</code></td>
+              <td><span class="badge badge-purple">Backend Main</span></td>
+              <td>FastAPI app creation, CORS middleware setup, startup database migrations & seed hooks, static SPA asset fallback handler.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/db.py</code></td>
+              <td><span class="badge badge-purple">Database</span></td>
+              <td>SQLAlchemy Engine setup, SQLite <code>PRAGMA foreign_keys=ON</code> connection hook, <code>get_db</code> dependency generator.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/models.py</code></td>
+              <td><span class="badge badge-purple">ORM Models</span></td>
+              <td>Declarative SQLAlchemy 2.0 entities: <code>User</code>, <code>Board</code>, <code>Column</code>, <code>Card</code>, <code>Conversation</code>, <code>Message</code>.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/schemas.py</code></td>
+              <td><span class="badge badge-purple">Pydantic</span></td>
+              <td>Request/response validation schemas for auth, board trees, card operations, and AI tool outputs.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/security.py</code></td>
+              <td><span class="badge badge-purple">Security</span></td>
+              <td>PBKDF2-SHA256 password hashing (600,000 iterations, 16-byte salt) and constant-time digest verification.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/sessions.py</code></td>
+              <td><span class="badge badge-purple">Sessions</span></td>
+              <td>In-memory bearer token session store mapping random 32-byte tokens to authenticated usernames.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/kanban.py</code></td>
+              <td><span class="badge badge-purple">Domain Logic</span></td>
+              <td>Board loading, user ownership verification, and positional update re-indexing calculations for cards & columns.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/serializers.py</code></td>
+              <td><span class="badge badge-purple">Serialization</span></td>
+              <td>Converts ORM entities into plain Pydantic models using explicit <code>selectinload</code> eager loading.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/services/ai.py</code></td>
+              <td><span class="badge badge-green">AI Integration</span></td>
+              <td>OpenRouter HTTP client, prompt engineering, TechCrunch RSS XML parser, and JSON response extractor.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>backend/app/services/board_ops.py</code></td>
+              <td><span class="badge badge-green">AI Operations</span></td>
+              <td>Applies AI proposed operations (add, edit, move, delete) transactionally to SQLite database.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/AppRoot.tsx</code></td>
+              <td><span class="badge badge-blue">Frontend Core</span></td>
+              <td>Auth state gate verifying session token in localStorage and rendering <code>LoginForm</code> or <code>KanbanBoard</code>.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/KanbanBoard.tsx</code></td>
+              <td><span class="badge badge-blue">UI Container</span></td>
+              <td>Top-level Kanban board manager handling @dnd-kit sensors, drag overlays, header buttons, and modal panels.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/KanbanColumn.tsx</code></td>
+              <td><span class="badge badge-blue">UI Component</span></td>
+              <td>Droppable column container, sortable context manager, and inline title editor.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/KanbanCard.tsx</code></td>
+              <td><span class="badge badge-blue">UI Component</span></td>
+              <td>Draggable card element displaying title, priority badge, details, and <code>CardActionsMenu</code> trigger.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/CardActionsMenu.tsx</code></td>
+              <td><span class="badge badge-green">AI UI</span></td>
+              <td>Card level popover menu triggering details generation, priority suggestions, and duplicate task detection.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/components/ChatSidebar.tsx</code></td>
+              <td><span class="badge badge-green">AI UI</span></td>
+              <td>Sliding drawer chat interface for conversing with AI board assistant and applying board changes.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/lib/api.ts</code></td>
+              <td><span class="badge badge-blue">API Client</span></td>
+              <td>Fetch wrapper injecting Bearer token, enforcing no-store cache, and handling 401 Unauthorized callbacks.</td>
+            </tr>
+            <tr class="search-target">
+              <td><code>frontend/src/lib/kanban.ts</code></td>
+              <td><span class="badge badge-blue">Helpers</span></td>
+              <td>Pure functions for DnD ID formatting (<code>c1</code>, <code>d2</code>) and client-side array re-ordering (<code>moveCard</code>).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 4: FUNCTIONS REFERENCE -->
+    <div id="functions" class="tab-content">
+      <h2 class="section-title">Complete Function Engine Reference</h2>
+      <p class="section-subtitle">Signatures, execution logic, and module origins for core functions.</p>
+
+      <div class="grid-2">
+        <div class="card search-target">
+          <div class="card-header">
+            <code>load_board(db, board_id, user_id)</code>
+            <span class="badge badge-purple">backend/app/kanban.py</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Fetches board by ID using SQLAlchemy. Verifies that board <code>user_id</code> matches requesting user. Raises <code>HTTP 404</code> if missing or <code>HTTP 403</code> if unauthorized.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <code>move_card(db, card, target_column_id, position)</code>
+            <span class="badge badge-purple">backend/app/kanban.py</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Re-calculates card array order in source and target columns. Re-indexes card positions sequentially (0, 1, 2...) to ensure zero index gaps across columns.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <code>chat_with_board(board, question, history)</code>
+            <span class="badge badge-green">backend/app/services/ai.py</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Formats system prompt, board JSON snapshot, and conversation history. Invokes OpenRouter API (`openai/gpt-oss-120b`) and parses JSON reply containing conversational text and board operations.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <code>apply_operations(db, operations, user, board_id)</code>
+            <span class="badge badge-green">backend/app/services/board_ops.py</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Executes AI proposed operations (add, edit, move, delete) transactionally. Validates user ownership and input bounds, returning applied and skipped logs.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <code>hash_password(password)</code>
+            <span class="badge badge-purple">backend/app/security.py</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Generates a 16-byte random salt and computes a PBKDF2-SHA256 digest with 600,000 iterations. Returns formatted string <code>pbkdf2_sha256$600000$salt$digest</code>.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <code>moveCard(columns, activeDndId, overDndId)</code>
+            <span class="badge badge-blue">frontend/src/lib/kanban.ts</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Parses namespaced DnD IDs (<code>c{id}</code>, <code>d{id}</code>), isolates dragging card, removes it from source column, and inserts it at destination target position for instant optimistic UI updates.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SYSTEM WORKFLOWS -->
+    <div id="flows" class="tab-content">
+      <h2 class="section-title">End-to-End System Workflows</h2>
+      <p class="section-subtitle">Visual step-by-step breakdown of core user and AI interactions.</p>
+
+      <h3 style="color: var(--primary-blue); margin-top: 1.5rem;">1. Drag-and-Drop Card Movement Execution</h3>
+      <div class="flow-stepper">
+        <div class="flow-step">
+          <div class="flow-step-num">1</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Sensor Activation</div>
+            <div class="flow-step-desc">User drags a card. <code>@dnd-kit</code> PointerSensor checks distance constraint (6px). DragOverlay renders float preview card.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">2</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Optimistic UI Update</div>
+            <div class="flow-step-desc"><code>onDragEnd</code> event fires. <code>moveCard()</code> in <code>lib/kanban.ts</code> updates local React state immediately for 0ms visual latency.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">3</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Backend API Sync</div>
+            <div class="flow-step-desc">Frontend issues <code>PATCH /api/cards/{card_id}</code> with target <code>column_id</code> and <code>position</code>.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">4</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Database Transaction & Re-indexing</div>
+            <div class="flow-step-desc">Backend <code>move_card()</code> executes inside a SQLite transaction, re-indexing cards sequentially. If request fails, frontend state reverts.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="color: var(--secondary-purple); margin-top: 2.5rem;">2. AI Assistant Natural Language Mutation</h3>
+      <div class="flow-stepper">
+        <div class="flow-step">
+          <div class="flow-step-num">1</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Chat Prompt Submission</div>
+            <div class="flow-step-desc">User inputs "Add a High priority bug fix task to In Progress" in <code>ChatSidebar</code>.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">2</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Context Snapshot & LLM Call</div>
+            <div class="flow-step-desc">FastAPI <code>POST /api/ai/chat</code> builds board snapshot JSON and calls OpenRouter API (<code>openai/gpt-oss-120b</code>).</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">3</div>
+          <div class="flow-step-content">
+            <div class="flow-step-title">Transactional Mutation</div>
+            <div class="flow-step-desc"><code>board_ops.apply_operations()</code> parses operations, executes DB mutations, appends chat message, and returns updated board tree.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: REST API MATRIX -->
+    <div id="api" class="tab-content">
+      <h2 class="section-title">REST API Specifications Matrix</h2>
+      <p class="section-subtitle">Complete specification for FastAPI REST endpoints.</p>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint Path</th>
+              <th>Auth Required</th>
+              <th>Description & Response Payload</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="search-target">
+              <td><span class="badge badge-green">POST</span></td>
+              <td><code>/api/auth/login</code></td>
+              <td>No</td>
+              <td>Verifies username and password hash, creates session token. Returns <code>SessionResponse</code>.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-green">POST</span></td>
+              <td><code>/api/auth/logout</code></td>
+              <td>Yes</td>
+              <td>Revokes active session token. Returns <code>{"success": true}</code>.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-blue">GET</span></td>
+              <td><code>/api/boards</code></td>
+              <td>Yes</td>
+              <td>Returns summary list of boards owned by user.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-blue">GET</span></td>
+              <td><code>/api/boards/{id}</code></td>
+              <td>Yes</td>
+              <td>Returns complete board tree including columns and cards.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-yellow">PATCH</span></td>
+              <td><code>/api/cards/{id}</code></td>
+              <td>Yes</td>
+              <td>Updates card details, priority, column target, or integer position.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-green">POST</span></td>
+              <td><code>/api/ai/chat</code></td>
+              <td>Yes</td>
+              <td>Processes natural language query, executes mutations, returns updated board state.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-green">POST</span></td>
+              <td><code>/api/ai/card-intelligence</code></td>
+              <td>Yes</td>
+              <td>Generates card criteria, suggests priorities, or detects duplicate cards.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-green">POST</span></td>
+              <td><code>/api/ai/workflow-optimization</code></td>
+              <td>Yes</td>
+              <td>Detects column bottlenecks, next card actions, and reordering suggestions.</td>
+            </tr>
+            <tr class="search-target">
+              <td><span class="badge badge-blue">GET</span></td>
+              <td><code>/api/ai/news</code></td>
+              <td>Yes</td>
+              <td>Fetches live AI tech news items from TechCrunch RSS feed.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 7: AI CO-PILOT SUITE -->
+    <div id="ai" class="tab-content">
+      <h2 class="section-title">AI Co-Pilot Suite (9 Intelligence Tools)</h2>
+      <p class="section-subtitle">Overview of integrated LLM tools and productivity modules.</p>
+
+      <div class="grid-3">
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">💬 AI Chat Co-Pilot</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Natural language assistant executing multi-step board operations transactionally (`add_card`, `edit_card`, `move_card`, `delete_card`).
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">🔍 Card Intelligence</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Generates markdown acceptance criteria, suggests card priorities based on context, and scans for duplicate tasks.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">⚡ Workflow Optimizer</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Identifies column bottlenecks, recommends immediate next steps for cards, and suggests optimal card sorting.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">📊 Daily Summary</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Computes metrics and generates actionable daily focus items with progress summaries.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">🔄 Sprint Retrospective</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Analyzes sprint achievements, areas for improvement, and concrete process action items.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">⚠️ Risk Assessment</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Identifies task blockers, single points of failure, and unclear scopes across pending cards.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">⏱️ Effort Estimation</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Estimates S/M/L T-shirt story points and provides practical technical implementation hints.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">🎙️ Standup Assistant</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Generates concise daily standup talking points and flags critical blockers.
+          </p>
+        </div>
+
+        <div class="card search-target">
+          <div class="card-header">
+            <span class="card-title">📰 AI Tech News RSS</span>
+          </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">
+            Aggregates live RSS technology news feeds from TechCrunch AI category.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Kanban Studio Enterprise Architecture & System Guide &bull; Optimized for FastAPI, Next.js, SQLite, and OpenRouter AI</p>
+  </footer>
+
+  <script>
+    function switchTab(event, tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.nav-tabs li').forEach(li => li.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    function filterContent() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const targets = document.querySelectorAll('.search-target');
+
+      targets.forEach(target => {
+        const text = target.innerText.toLowerCase();
+        if (text.includes(query)) {
+          target.style.display = '';
+        } else {
+          target.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
