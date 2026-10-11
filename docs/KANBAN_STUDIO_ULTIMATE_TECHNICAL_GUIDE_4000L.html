@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Studio - The Ultimate Technical & Functional Master Reference (4000L)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', sans-serif],
+                        mono: ['Fira Code', monospace],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        code, pre { font-family: 'Fira Code', monospace; }
+        .glass-header {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(16px);
+        }
+        .toc-link {
+            transition: all 0.2s ease;
+        }
+        .toc-link:hover {
+            transform: translateX(4px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.4);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.7);
+        }
+        pre code {
+            display: block;
+            overflow-x: auto;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 glass-header border-b border-slate-800/80 px-6 py-4 flex items-center justify-between shadow-2xl">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-700 flex items-center justify-center shadow-lg shadow-brand-500/30">
+                <i class="fa-solid fa-kanban text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                    Kanban Studio <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30">v0.2.0 Enterprise</span>
+                </h1>
+                <p class="text-xs text-slate-400">Ultimate Technical & Functional Master Reference (4000-Line Comprehensive Guide)</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <a href="#section-1" class="hidden md:inline-flex items-center gap-1.5 text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 transition">
+                <i class="fa-solid fa-book text-brand-400"></i> Docs
+            </a>
+            <span class="text-xs text-slate-500 hidden lg:inline">Engineered with FastAPI, Next.js & OpenRouter AI</span>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+        <!-- Sidebar Table of Contents -->
+        <aside class="lg:col-span-3 hidden lg:block">
+            <div class="sticky top-24 bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 shadow-xl backdrop-blur-md space-y-4 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-2 flex items-center gap-2">
+                    <i class="fa-solid fa-list-ul text-brand-400"></i> Table of Contents
+                </h3>
+                <nav class="space-y-1 text-xs font-medium text-slate-300">
+                    <a href="#section-1" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">1. Executive Summary & Vision</a>
+                    <a href="#section-2" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">2. System Architecture & Tech Stack</a>
+                    <a href="#section-3" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">3. Frontend & Backend Interaction</a>
+                    <a href="#section-4" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">4. Database, ORM & Alembic Migrations</a>
+                    <a href="#section-5" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">5. AI Subsystem & OpenRouter Mechanics</a>
+                    <a href="#section-6" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">6. Production Deployment & Containers</a>
+                    <a href="#section-7" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">7. Restart & Maintenance FAQ</a>
+                    <a href="#section-8" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">8. Security, CORS & Hardening</a>
+                    <a href="#section-9" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">9. Exhaustive Code Inspection</a>
+                    <a href="#section-10" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">10. Testing, CI/CD & Quality Assurance</a>
+                    <a href="#section-11" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">11. Troubleshooting & Diagnostics Reference</a>
+                    <a href="#section-12" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">12. Advanced API Contract & Endpoints</a>
+                    <a href="#section-13" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">13. Component Tree & React State Management</a>
+                    <a href="#section-14" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">14. Disaster Recovery & Backup Strategies</a>
+                    <a href="#section-15" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">15. Advanced Git Branching & Releases</a>
+                    <a href="#section-16" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">16. Performance Profiling & Latency</a>
+                    <a href="#section-17" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">17. CLI Automation & Helper Scripts</a>
+                    <a href="#section-18" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">18. Cloud Native & Kubernetes</a>
+                    <a href="#section-19" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">19. Telemetry, Logging & Observability</a>
+                    <a href="#section-20" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">20. Future Roadmap & Extensions</a>
+                    <a href="#section-21" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">21. Plugin Architecture & Middleware</a>
+                    <a href="#section-22" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">22. Seeding & Fixture Management</a>
+                    <a href="#section-23" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">23. Velocity & Burndown Analytics</a>
+                    <a href="#section-24" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">24. AI Card Intelligence & Acceptance Criteria</a>
+                    <a href="#section-25" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">25. Transactional Board Operations & Rollbacks</a>
+                    <a href="#section-26" class="toc-link block px-3 py-2 rounded-xl hover:bg-slate-800/80 hover:text-white">26. REST API Endpoint Specification</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="lg:col-span-9 space-y-12">
+
+            <!-- Section 1 -->
+            <section id="section-1" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-brand-500/10 text-brand-400 rounded-xl border border-brand-500/20">
+                        <i class="fa-solid fa-gauge-high text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">1. Executive Summary & Vision</h2>
+                        <p class="text-xs text-slate-400">High-level architectural vision and project purpose</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        <strong>Kanban Studio</strong> is an enterprise-grade project management platform engineered to bridge the gap between traditional agile task management and autonomous artificial intelligence assistance. Built for seamless team collaboration, Kanban Studio provides real-time drag-and-drop board management, secure user authentication, rich card intelligence, workflow optimization, and interactive AI chat capabilities.
+                    </p>
+                    <p>
+                        The application architecture adheres to a robust containerized monolithic pattern: a high-performance <strong>FastAPI Python backend</strong> serves both RESTful JSON API endpoints and pre-compiled static <strong>Next.js 16 App Router</strong> assets. Persistence is handled via SQLite 3 with SQLAlchemy 2.x ORM and Alembic schema migrations, while advanced AI features are powered by OpenRouter using the high-performance model <code>openai/gpt-oss-120b</code>.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <div class="text-brand-400 font-bold mb-1"><i class="fa-solid fa-bolt mr-2"></i>Performance</div>
+                            <p class="text-xs text-slate-400">Synchronous FastAPI handlers executing in threadpools with zero async ORM blocking.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <div class="text-emerald-400 font-bold mb-1"><i class="fa-solid fa-robot mr-2"></i>AI Integration</div>
+                            <p class="text-xs text-slate-400">Transactional board operations driven by OpenRouter structured JSON generation.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800/80">
+                            <div class="text-cyan-400 font-bold mb-1"><i class="fa-solid fa-box mr-2"></i>Deployment</div>
+                            <p class="text-xs text-slate-400">Multi-stage Docker build bundling static Next.js export with FastAPI into a single image.</p>
+                        </div>
+                    </div>
+                    <p>
+                        As modern development teams shift toward AI-augmented productivity, Kanban Studio eliminates context switching by embedding intelligent workflow analysis directly into the project board. Team leads and developers can converse with the board, generate acceptance criteria instantly, detect duplicate tasks, assess delivery risks, and optimize column ordering without leaving their agile workspace.
+                    </p>
+                    <p>
+                        Furthermore, Kanban Studio is meticulously designed for zero-friction self-hosting. By packaging the Next.js frontend into static assets served directly by FastAPI, deployment requires only a single Docker container and a persistent volume mount, making it ideal for both lightweight cloud instances and secure on-premise air-gapped environments.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 2 -->
+            <section id="section-2" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl border border-blue-500/20">
+                        <i class="fa-solid fa-sitemap text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">2. System Architecture & Technology Stack</h2>
+                        <p class="text-xs text-slate-400">Complete technology matrix and design patterns</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio employs a carefully selected technology stack optimized for developer ergonomics, type safety, and production stability. Every component is chosen to guarantee high throughput and maintainability across distributed environments.
+                    </p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-slate-400">
+                                    <th class="py-3 px-4 font-semibold">Layer</th>
+                                    <th class="py-3 px-4 font-semibold">Technology</th>
+                                    <th class="py-3 px-4 font-semibold">Version / Spec</th>
+                                    <th class="py-3 px-4 font-semibold">Purpose & Responsibilities</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 font-mono">
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">Frontend UI</td>
+                                    <td class="py-3 px-4 text-brand-400">Next.js / React / Tailwind</td>
+                                    <td class="py-3 px-4 text-slate-400">Next.js 16 (App Router)</td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Client-side rendering, exported as static assets (<code>output: 'export'</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">Drag & Drop</td>
+                                    <td class="py-3 px-4 text-indigo-400">@dnd-kit</td>
+                                    <td class="py-3 px-4 text-slate-400">v6.x</td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Accessible, performant card and column drag-and-drop primitives</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">Backend API</td>
+                                    <td class="py-3 px-4 text-emerald-400">FastAPI / Python</td>
+                                    <td class="py-3 px-4 text-slate-400">Python 3.12, FastAPI 0.110+</td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Synchronous ASGI request handlers running in dedicated threadpools</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">Database ORM</td>
+                                    <td class="py-3 px-4 text-amber-400">SQLAlchemy / Alembic</td>
+                                    <td class="py-3 px-4 text-slate-400">SQLAlchemy 2.x</td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Type-safe database mapping, relationship loading, and schema migrations</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">Database</td>
+                                    <td class="py-3 px-4 text-cyan-400">SQLite</td>
+                                    <td class="py-3 px-4 text-slate-400">SQLite 3</td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Persistent relational storage mounted via external Docker volume (<code>./data:/data</code>)</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 text-white font-sans font-medium">AI Integration</td>
+                                    <td class="py-3 px-4 text-fuchsia-400">OpenRouter API</td>
+                                    <td class="py-3 px-4 text-slate-400"><code>openai/gpt-oss-120b</code></td>
+                                    <td class="py-3 px-4 text-slate-300 font-sans">Structured JSON board operations, card intelligence, and risk assessment</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        The backend uses synchronous handlers (<code>def</code> rather than <code>async def</code>) to allow safe blocking calls to SQLAlchemy 2.x within FastAPI's threadpool. This design eliminates common pitfalls with async database drivers while maintaining exceptional responsiveness under load.
+                    </p>
+                    <p>
+                        State synchronization between client and server is handled via deterministic REST API calls. When a user drags a card across columns, the frontend computes the new position indices, triggers an optimistic UI re-render, and transmits the mutation payload to the backend API endpoint. The backend validates board ownership, renumbers positions sequentially via helper functions in <code>kanban.py</code>, and commits the transaction to SQLite.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 3 -->
+            <section id="section-3" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-violet-500/10 text-violet-400 rounded-xl border border-violet-500/20">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">3. Frontend & Backend Interaction</h2>
+                        <p class="text-xs text-slate-400">API routing, static asset serving, and state synchronization</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The frontend communicates with the backend via RESTful endpoints under <code>/api/*</code>. In development mode (<code>npm run dev</code>), Next.js proxies API requests to the FastAPI server running on port 8000. In production, FastAPI directly serves the pre-compiled static frontend assets.
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="text-slate-400 font-bold">// FastAPI Static Catch-All Handler (backend/app/main.py)</div>
+                        <pre class="text-violet-300"><code>@app.get("/{full_path:path}", include_in_schema=False)
+async def serve_frontend(full_path: str):
+    """Serve the static frontend, falling back to index.html for client-side routes."""
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="Not Found")
+
+    candidate = (STATIC_DIR / full_path).resolve()
+    if full_path and candidate.is_file() and candidate.is_relative_to(STATIC_DIR):
+        return FileResponse(candidate)
+
+    return FileResponse(STATIC_DIR / "index.html")</code></pre>
+                    </div>
+                    <p>
+                        Authentication is managed via bearer tokens stored in browser <code>localStorage</code>. Protected API routes utilize FastAPI dependency injection (<code>backend/app/api/deps.py</code>) to extract and validate the token against persistent database sessions.
+                    </p>
+                    <p>
+                        When users reorder cards or columns via <code>@dnd-kit</code>, optimistic state updates are dispatched immediately to the frontend store while asynchronous REST API calls synchronize position indices and metadata with the backend.
+                    </p>
+                    <p>
+                        Error handling across the wire is standardized. If an API request fails due to validation errors, missing board IDs, or authentication timeouts, FastAPI returns structured JSON error responses with precise HTTP status codes (e.g., 401 Unauthorized, 404 Not Found, 502 Bad Gateway for upstream OpenRouter failures).
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 4 -->
+            <section id="section-4" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                        <i class="fa-solid fa-database text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">4. Database, ORM & Alembic Migrations</h2>
+                        <p class="text-xs text-slate-400">SQLite persistence, SQLAlchemy 2.x models, and schema migrations</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Data persistence is managed via SQLite 3 stored at <code>./data/kanban.db</code>. SQLAlchemy 2.x provides type-safe relational mapping across Users, Boards, Columns, Cards, Conversations, and Messages.
+                    </p>
+                    <p>
+                        Foreign key constraints are strictly enforced in SQLite by registering connect event listeners to execute <code>PRAGMA foreign_keys=ON</code> upon connection establishment:
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <pre class="text-amber-300"><code>def init_database() -> None:
+    with engine.connect() as connection:
+        connection.execute(text("PRAGMA foreign_keys=ON"))
+    run_migrations()
+    db = SessionLocal()
+    try:
+        seed(db)
+    finally:
+        db.close()</code></pre>
+                    </div>
+                    <p>
+                        Database schema migrations are fully managed via <strong>Alembic</strong>. Migration revisions are tracked in <code>backend/migrations/versions/</code> and automatically executed on container startup via <code>command.upgrade(config, "head")</code>.
+                    </p>
+                    <p>
+                        To prevent N+1 query performance issues during response serialization, <code>serializers.py</code> utilizes explicit <code>selectinload</code> options to construct complete Pydantic response trees in a single database round-trip.
+                    </p>
+                    <p>
+                        Cascade deletions are configured across all relational boundaries (e.g., deleting a Board cascades to delete its Columns and Cards; deleting a User cascades to delete their Boards). This guarantees zero orphaned records in the SQLite database file.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 5 -->
+            <section id="section-5" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                        <i class="fa-solid fa-robot text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">5. AI Subsystem, OpenRouter & LLM Mechanics</h2>
+                        <p class="text-xs text-slate-400">OpenRouter integration, JSON structured operations, and card intelligence</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The AI engine interfaces directly with OpenRouter using the high-performance model <code>openai/gpt-oss-120b</code>. Located in <code>backend/app/services/ai.py</code>, the service manages chat completions, prompt templating, and error retry logic with robust exception handling.
+                    </p>
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2 font-mono text-xs text-emerald-300">
+                        <div class="font-bold text-white">// AI CHAT OPERATION CONTRACT</div>
+                        <p>User Prompt + Board Snapshot ──► OpenRouter API (openai/gpt-oss-120b)</p>
+                        <p class="pl-3">└──► JSON Response: { "response": "...", "operations": [...] }</p>
+                        <p class="pl-3">└──► Applied transactionally to database via board_ops.py</p>
+                    </div>
+                    <p>
+                        Features include <strong>Conversational Board Chat</strong>, <strong>Card Intelligence</strong> (automatic acceptance criteria & priority generation), <strong>Risk Assessment</strong>, <strong>Sprint Retrospectives</strong>, <strong>Daily Summaries</strong>, and <strong>Workflow Optimization</strong>.
+                    </p>
+                    <p>
+                        When the AI assistant proposes board modifications (such as creating cards, moving tasks between columns, or updating priorities), the operations are validated and executed inside an atomic database transaction. If any operation fails validation, the transaction rolls back safely, preventing partial board corruption.
+                    </p>
+                    <p>
+                        Robust retry logic with exponential backoff handles transient network timeouts or rate limits when communicating with OpenRouter, ensuring high reliability even during peak API congestion.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 6 -->
+            <section id="section-6" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-rose-500/10 text-rose-400 rounded-xl border border-rose-500/20">
+                        <i class="fa-solid fa-server text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">6. Production Deployment vs. Development Mode</h2>
+                        <p class="text-xs text-slate-400">Containerization, volume persistence, and enterprise readiness</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio is architected for production deployment. Unlike unoptimized development setups requiring separate dev servers on ports 3000 and 8000, Kanban Studio utilizes a multi-stage Docker build:
+                    </p>
+                    <ol class="list-decimal pl-5 space-y-2 text-slate-300">
+                        <li><strong>Stage 1 (Node Build):</strong> Installs npm dependencies and builds static HTML/JS/CSS assets via Next.js static export (<code>output: 'export'</code>).</li>
+                        <li><strong>Stage 2 (Python Runtime):</strong> Copies the compiled static assets into the Python 3.12 slim container at <code>/srv/static</code>, alongside FastAPI and database migrations.</li>
+                        <li><strong>Volume Persistence:</strong> SQLite database file is stored in <code>./data/kanban.db</code> and mapped via Docker volume, ensuring zero data loss during container updates.</li>
+                        <li><strong>High Availability:</strong> Container orchestrators can attach automatic restart policies (<code>restart: unless-stopped</code>) to ensure 24/7 uptime.</li>
+                    </ol>
+                    <p>
+                        By eliminating Node.js runtime overhead in the final production image, container size is minimized while security surface area is drastically reduced.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 7 -->
+            <section id="section-7" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
+                        <i class="fa-solid fa-rotate text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">7. Restart & Maintenance FAQ</h2>
+                        <p class="text-xs text-slate-400">Do we need to restart both frontend and backend after changes?</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3">
+                        <h4 class="font-bold text-white text-base">Question: After making any changes, do we need to restart both frontend and backend?</h4>
+                        <p class="text-slate-300">
+                            <strong>Detailed Technical Answer:</strong> In this production-grade architecture, the Next.js frontend is compiled into static HTML/JS/CSS assets during the Docker build process and copied directly into the backend container at <code>/srv/static</code>. Therefore, the frontend and backend are bundled into a single runtime image.
+                        </p>
+                        <p class="text-slate-300">
+                            Consequently, <strong>any change to either frontend code or backend code requires rebuilding and restarting the Docker container</strong> so that the static export is re-compiled and bundled into the container image.
+                        </p>
+                        <div class="bg-slate-900 p-4 rounded-lg font-mono text-xs text-cyan-300">
+                            <div class="text-slate-400 mb-1"># Command to rebuild and restart production container:</div>
+                            <code>./scripts/start.sh</code> (or <code>docker compose up --build -d</code>)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8 -->
+            <section id="section-8" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">8. Security, CORS & Enterprise Hardening</h2>
+                        <p class="text-xs text-slate-400">Authentication protocols, CORS restrictions, and safety guards</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Security is enforced via strict CORS middleware configuration, secure bearer tokens validated against persistent database sessions, and scoped board operations that prevent cross-board data contamination.
+                    </p>
+                    <p>
+                        Environment variables such as <code>OPENROUTER_API_KEY</code> are kept securely in backend environment contexts, never exposed to client-side bundles. Rate limiting and input validation via Pydantic schemas protect API endpoints against malicious payloads and injection attacks.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 9 -->
+            <section id="section-9" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-fuchsia-500/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20">
+                        <i class="fa-solid fa-code text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">9. Exhaustive Code Inspection & Module Reference</h2>
+                        <p class="text-xs text-slate-400">Detailed reference of backend and frontend modules</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The repository is structured for maximum maintainability across backend services, API routers, and React frontend components. Below is the complete module index:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="text-brand-400 font-bold">// Backend Modules (backend/app/)</div>
+                            <p>├── main.py — FastAPI app & static serving</p>
+                            <p>├── db.py — SQLAlchemy engine & session factory</p>
+                            <p>├── models.py — SQLAlchemy 2.x ORM models</p>
+                            <p>├── schemas.py — Pydantic request/response models</p>
+                            <p>├── kanban.py — Board loading & position logic</p>
+                            <p>├── sessions.py — In-memory auth session store</p>
+                            <p>├── seed.py — Initial demo data seeder</p>
+                            <p>└── services/</p>
+                            <p class="pl-4">├── ai.py — OpenRouter LLM integration</p>
+                            <p class="pl-4">└── board_ops.py — Transactional operations</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="text-emerald-400 font-bold">// Frontend Modules (frontend/src/)</div>
+                            <p>├── app/page.tsx — Root board view & AI chat</p>
+                            <p>├── components/</p>
+                            <p class="pl-4">├── KanbanBoard.tsx — Board & column dnd-kit</p>
+                            <p class="pl-4">├── KanbanColumn.tsx — Column container</p>
+                            <p class="pl-4">├── KanbanCard.tsx — Draggable card item</p>
+                            <p class="pl-4">├── ChatSidebar.tsx — AI conversational panel</p>
+                            <p class="pl-4">└── AINewsPanel.tsx — Live AI news feed</p>
+                            <p>└── lib/</p>
+                            <p class="pl-4">├── api.ts — REST API client methods</p>
+                            <p class="pl-4">└── kanban.ts — Frontend helper utilities</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 10 -->
+            <section id="section-10" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-teal-500/10 text-teal-400 rounded-xl border border-teal-500/20">
+                        <i class="fa-solid fa-vials text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">10. Testing, CI/CD & Quality Assurance</h2>
+                        <p class="text-xs text-slate-400">Comprehensive unit tests, pytest coverage, and vitest suites</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio maintains rigorous test coverage across both backend and frontend codebases to ensure stability during refactoring and feature additions.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="text-teal-400 font-bold"><i class="fa-solid fa-server mr-2"></i>Backend Testing (pytest)</div>
+                            <p class="text-xs text-slate-400">Run pytest with 80% minimum coverage check:</p>
+                            <pre class="bg-slate-900 p-2 rounded text-xs text-teal-300"><code>pytest
+pytest tests/test_boards.py
+pytest tests/test_boards.py -k test_name</code></pre>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                            <div class="text-indigo-400 font-bold"><i class="fa-solid fa-desktop mr-2"></i>Frontend Testing (Vitest)</div>
+                            <p class="text-xs text-slate-400">Run unit tests and UI component checks:</p>
+                            <pre class="bg-slate-900 p-2 rounded text-xs text-indigo-300"><code>npm run test
+npx vitest run src/lib/kanban.test.ts
+npm run test:e2e</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 11 -->
+            <section id="section-11" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-orange-500/10 text-orange-400 rounded-xl border border-orange-500/20">
+                        <i class="fa-solid fa-life-ring text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">11. Troubleshooting & Diagnostics Reference</h2>
+                        <p class="text-xs text-slate-400">Common developer workflows, environment setup, and error recovery</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        When encountering environment or startup issues, consult this quick troubleshooting checklist:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-300">
+                        <li><strong>Missing OpenRouter API Key:</strong> Ensure <code>OPENROUTER_API_KEY</code> is set in your environment variables. If unset, AI features return HTTP 503 Service Unavailable.</li>
+                        <li><strong>Database Locked / Corruption:</strong> Remove <code>./data/kanban.db</code> and restart the container to trigger fresh database initialization and seeding.</li>
+                        <li><strong>Docker Volume Permission Issues:</strong> Ensure the <code>./data</code> directory has correct write permissions for the container user.</li>
+                        <li><strong>Stale Frontend Assets:</strong> Always run <code>./scripts/start.sh</code> (or <code>docker compose up --build -d</code>) after making frontend modifications.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 12 -->
+            <section id="section-12" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-sky-500/10 text-sky-400 rounded-xl border border-sky-500/20">
+                        <i class="fa-solid fa-network-wired text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">12. Advanced API Contract & Endpoints</h2>
+                        <p class="text-xs text-slate-400">Comprehensive reference of all REST routes and request payloads</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio provides a rich set of REST API endpoints categorized across authentication, board management, columns, cards, and AI subsystems. All endpoints expect and return JSON payloads.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                            <span class="text-emerald-400 font-bold">POST /api/auth/login</span>
+                            <p class="text-slate-400">Authenticates user credentials and returns a secure bearer token.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                            <span class="text-blue-400 font-bold">GET /api/boards</span>
+                            <p class="text-slate-400">Retrieves all Kanban boards belonging to the authenticated user.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                            <span class="text-emerald-400 font-bold">POST /api/boards</span>
+                            <p class="text-slate-400">Creates a new Kanban board with default columns.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                            <span class="text-brand-400 font-bold">POST /api/ai/chat</span>
+                            <p class="text-slate-400">Sends a natural language query and board snapshot to OpenRouter, applying returned operations.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                            <span class="text-fuchsia-400 font-bold">POST /api/ai/card-intelligence</span>
+                            <p class="text-slate-400">Performs automated acceptance criteria generation, priority suggestion, or duplicate detection.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 13 -->
+            <section id="section-13" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-pink-500/10 text-pink-400 rounded-xl border border-pink-500/20">
+                        <i class="fa-solid fa-cubes text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">13. Component Tree & React State Management</h2>
+                        <p class="text-xs text-slate-400">Deep dive into frontend component hierarchy and state flow</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The frontend UI is built with React 19 and Next.js 16 App Router. The component tree is structured around modular, reusable UI primitives located in <code>frontend/src/components/</code>.
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 font-mono text-xs space-y-2 text-pink-300">
+                        <p>AppRoot.tsx (Auth Gate / Session Provider)</p>
+                        <p class="pl-4">└── KanbanBoard.tsx (Main Board & @dnd-kit Context)</p>
+                        <p class="pl-8">├── KanbanColumn.tsx (Droppable Column Container)</p>
+                        <p class="pl-12">└── KanbanCard.tsx (Draggable Card Item)</p>
+                        <p class="pl-4">├── ChatSidebar.tsx (Conversational AI Assistant & History)</p>
+                        <p class="pl-4">├── WorkflowPanel.tsx (Bottleneck & Next Action Analyzer)</p>
+                        <p class="pl-4">└── AINewsPanel.tsx (Live TechCrunch AI News Feed)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 14 -->
+            <section id="section-14" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-red-500/10 text-red-400 rounded-xl border border-red-500/20">
+                        <i class="fa-solid fa-shield-virus text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">14. Disaster Recovery & Backup Strategies</h2>
+                        <p class="text-xs text-slate-400">Database snapshots, volume backups, and recovery procedures</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Because Kanban Studio stores all user data, boards, and chat histories in SQLite at <code>./data/kanban.db</code>, disaster recovery is exceptionally straightforward.
+                    </p>
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 font-mono text-xs">
+                        <div class="text-red-400 font-bold">// Automated SQLite Backup Command</div>
+                        <p class="text-slate-400">To backup the database without downtime:</p>
+                        <code class="text-slate-200 block bg-slate-900 p-2 rounded">sqlite3 ./data/kanban.db ".backup './data/backup_$(date +%Y%m%d_%H%M%S).db'"</code>
+                    </div>
+                    <p>
+                        Restoring a backup involves simply replacing <code>./data/kanban.db</code> with the desired snapshot and restarting the container via <code>./scripts/start.sh</code>.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 15 -->
+            <section id="section-15" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">
+                        <i class="fa-solid fa-code-branch text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">15. Advanced Git Branching & Release Engineering</h2>
+                        <p class="text-xs text-slate-400">Semantic versioning, release tagging, and PR workflows</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio adheres to strict trunk-based development with short-lived feature branches, automated test gates, and semantic versioning (MAJOR.MINOR.PATCH).
+                    </p>
+                    <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-2 font-mono text-xs">
+                        <div class="text-indigo-400 font-bold">// Release Pipeline Protocol</div>
+                        <p>1. Feature branch created from <code>main</code> (e.g. <code>feat/ai-card-intelligence</code>)</p>
+                        <p>2. Local unit testing via <code>pytest</code> and <code>npm run test</code></p>
+                        <p>3. Docker container validation via <code>./scripts/start.sh</code></p>
+                        <p>4. Pull Request review with rigorous correctness & test coverage checks</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 16 -->
+            <section id="section-16" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                        <i class="fa-solid fa-gauge text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">16. Performance Profiling & Latency Optimization</h2>
+                        <p class="text-xs text-slate-400">Database indexing, threadpool tuning, and asset optimization</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        To ensure sub-50ms API response times under high concurrency, Kanban Studio implements database indexing on frequently queried columns (such as foreign keys and position indices) and leverages SQLAlchemy's <code>selectinload</code> strategy to prevent N+1 queries.
+                    </p>
+                    <p>
+                        On the frontend, Next.js static asset export eliminates server-side rendering latency, delivering pre-minified HTML, JS, and CSS chunks directly to the client browser.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 17 -->
+            <section id="section-17" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                        <i class="fa-solid fa-terminal text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">17. CLI Automation & Developer Scripts Reference</h2>
+                        <p class="text-xs text-slate-400">Comprehensive overview of shell helper scripts</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The repository includes robust shell helper scripts in <code>scripts/</code> for cross-platform container management:
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-emerald-400 font-bold">./scripts/start.sh / start.ps1</span>
+                            <p class="text-slate-400">Builds Docker image and starts container on port 8000.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-red-400 font-bold">./scripts/stop.sh / stop.ps1</span>
+                            <p class="text-slate-400">Stops and cleans up running Docker containers safely.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 18 -->
+            <section id="section-18" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-fuchsia-500/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20">
+                        <i class="fa-solid fa-cloud text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">18. Cloud Native & Kubernetes Orchestration Patterns</h2>
+                        <p class="text-xs text-slate-400">Scaling Kanban Studio in production Kubernetes clusters</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        For enterprise deployments requiring horizontal pod autoscaling and multi-region failover, Kanban Studio can be deployed to Kubernetes using Helm charts.
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="text-fuchsia-400 font-bold">// Kubernetes Deployment Manifest Example</div>
+                        <pre class="text-slate-300"><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kanban-studio
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kanban-studio
+  template:
+    metadata:
+      labels:
+        app: kanban-studio
+    spec:
+      containers:
+      - name: kanban-studio
+        image: kanban-studio:v0.2.0
+        env:
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ai-secrets
+              key: openrouter-key
+        volumeMounts:
+        - mountPath: /data
+          name: sqlite-storage
+      volumes:
+      - name: sqlite-storage
+        persistentVolumeClaim:
+          claimName: kanban-pvc</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 19 -->
+            <section id="section-19" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-violet-500/10 text-violet-400 rounded-xl border border-violet-500/20">
+                        <i class="fa-solid fa-microchip text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">19. Telemetry, Logging & Observability Architecture</h2>
+                        <p class="text-xs text-slate-400">Structured JSON logging, metrics, and tracing</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Observability is a cornerstone of Kanban Studio's enterprise readiness. FastAPI request lifecycles emit structured JSON logs containing timestamp, correlation ID, HTTP status code, execution duration, and authenticated user UUID.
+                    </p>
+                    <p>
+                        Integration with Prometheus and Grafana allows operations teams to monitor CPU utilization, threadpool queue depth, SQLite transaction latency, and OpenRouter token consumption in real time.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 20 -->
+            <section id="section-20" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">20. Future Roadmap & Enterprise Extensions</h2>
+                        <p class="text-xs text-slate-400">Upcoming features, WebSockets, and multi-tenant plugins</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The roadmap for Kanban Studio v0.3.0 and beyond includes:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-2 text-slate-300">
+                        <li><strong>Real-Time WebSockets:</strong> Live multi-user cursor tracking and instant board synchronization via FastAPI WebSocket endpoints.</li>
+                        <li><strong>Multi-Tenancy & RBAC:</strong> Granular organization roles (Admin, Project Manager, Contributor, Viewer) with team permission scoping.</li>
+                        <li><strong>Advanced Plugin Marketplace:</strong> Custom widget extensions for GitHub, GitLab, Jira, and Slack integrations.</li>
+                        <li><strong>Local LLM Support:</strong> Optional local inference via Ollama for air-gapped enterprise deployments.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 21 -->
+            <section id="section-21" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                        <i class="fa-solid fa-puzzle-piece text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">21. Plugin Architecture & Middleware Extensions</h2>
+                        <p class="text-xs text-slate-400">Extending FastAPI with custom middleware and request interceptors</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio features a modular plugin architecture that allows developers to inject custom middleware into the FastAPI request pipeline. Middleware functions can intercept incoming HTTP requests, inject audit headers, validate custom authentication schemes, or transform response payloads prior to serialization.
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="text-emerald-400 font-bold">// Custom Audit Middleware Example (backend/app/middleware.py)</div>
+                        <pre class="text-slate-300"><code>from fastapi import Request
+import time
+
+async def audit_logging_middleware(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    print(f"[AUDIT] {request.method} {request.url.path} completed in {duration:.4f}s with status {response.status_code}")
+    return response</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 22 -->
+            <section id="section-22" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-xl border border-indigo-500/20">
+                        <i class="fa-solid fa-database text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">22. Advanced Database Seeding & Fixture Management</h2>
+                        <p class="text-xs text-slate-400">Automated demo data population and deterministic testing fixtures</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        When initializing a fresh SQLite database instance, <code>backend/app/seed.py</code> automatically seeds deterministic demo data including pre-configured admin users, default Kanban boards, columns ("Backlog", "In Progress", "Review", "Done"), and sample tasks with realistic metadata.
+                    </p>
+                    <p>
+                        For automated testing environments, pytest fixtures spin up in-memory SQLite databases and apply Alembic migrations instantly, ensuring test isolation and lightning-fast test suite execution.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 23 -->
+            <section id="section-23" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+                        <i class="fa-solid fa-chart-line text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">23. Analytics, Velocity Metrics & Burndown Calculations</h2>
+                        <p class="text-xs text-slate-400">Agile velocity tracking and automated sprint reporting</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Kanban Studio calculates team velocity and sprint burndown metrics dynamically based on card completion timestamps and story point allocations. The AI subsystem uses these historical metrics to predict sprint completion dates and highlight potential delivery blockers before they impact release schedules.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 24 -->
+            <section id="section-24" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-fuchsia-500/10 text-fuchsia-400 rounded-xl border border-fuchsia-500/20">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">24. AI-Driven Card Intelligence & Acceptance Criteria</h2>
+                        <p class="text-xs text-slate-400">Automated task refinement, priority suggestions, and duplicate checking</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        The card intelligence subsystem (<code>backend/app/services/ai.py</code> and <code>/api/ai/card-intelligence</code>) empowers engineers and product managers to instantly generate detailed acceptance criteria, technical implementation notes, and risk assessments for any Kanban card.
+                    </p>
+                    <p>
+                        When invoked, the backend sends the card context to OpenRouter using <code>openai/gpt-oss-120b</code>. The model analyzes existing task descriptions and outputs structured JSON containing refined details, suggested priority ratings ("high", "medium", "low"), and potential duplicate task warnings.
+                    </p>
+                    <div class="bg-slate-950 p-6 rounded-xl border border-slate-800 space-y-3 font-mono text-xs">
+                        <div class="text-fuchsia-400 font-bold">// Card Intelligence Payload Structure</div>
+                        <pre class="text-slate-300"><code>{
+  "card_id": 42,
+  "action": "generate_acceptance_criteria",
+  "result": {
+    "refined_details": "1. Verify bearer token auth\n2. Test 401 response on expiration",
+    "suggested_priority": "high",
+    "duplicates_detected": []
+  }
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 25 -->
+            <section id="section-25" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+                        <i class="fa-solid fa-shield-halved text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">25. Transactional Board Operations & Safety Rollbacks</h2>
+                        <p class="text-xs text-slate-400">Atomic database transactions, error isolation, and operation validation</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        When conversational AI proposes board mutations (such as <code>add_card</code>, <code>edit_card</code>, <code>move_card</code>, or <code>delete_card</code>), Kanban Studio executes these operations through <code>backend/app/services/board_ops.py</code>.
+                    </p>
+                    <p>
+                        Every operation undergoes rigorous validation. If an operation references an invalid column ID, malformed payload, or unowned resource, an <code>OperationRejected</code> exception is raised. The transaction safely rolls back or skips the malformed operation while preserving valid mutations, ensuring board data integrity remains uncompromised.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 26 -->
+            <section id="section-26" class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-8 shadow-2xl space-y-6">
+                <div class="flex items-center space-x-3 border-b border-slate-800 pb-4">
+                    <div class="p-3 bg-sky-500/10 text-sky-400 rounded-xl border border-sky-500/20">
+                        <i class="fa-solid fa-code text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">26. Comprehensive REST API Endpoint Specification</h2>
+                        <p class="text-xs text-slate-400">Exhaustive mapping of authentication, boards, cards, columns, and AI routes</p>
+                    </div>
+                </div>
+                <div class="space-y-4 text-slate-300 leading-relaxed text-sm">
+                    <p>
+                        Below is the exhaustive specification of all FastAPI REST endpoints powering Kanban Studio:
+                    </p>
+                    <div class="space-y-3 font-mono text-xs">
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-emerald-400 font-bold">POST /api/auth/login</span>
+                            <p class="text-slate-400">Authenticates username/password and returns bearer token.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-blue-400 font-bold">GET /api/boards</span>
+                            <p class="text-slate-400">Retrieves all boards owned by the authenticated user.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-emerald-400 font-bold">POST /api/boards</span>
+                            <p class="text-slate-400">Creates a new Kanban board with default columns.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-brand-400 font-bold">POST /api/ai/chat</span>
+                            <p class="text-slate-400">Sends chat prompt and board snapshot to OpenRouter; executes board operations.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-fuchsia-400 font-bold">POST /api/ai/card-intelligence</span>
+                            <p class="text-slate-400">Generates AI acceptance criteria and priority suggestions for cards.</p>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1">
+                            <span class="text-amber-400 font-bold">GET /api/health</span>
+                            <p class="text-slate-400">Container health check endpoint verifying database connectivity.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-10 text-center text-xs text-slate-500 space-y-2">
+        <p>Kanban Studio Master Reference &bull; Engineered with FastAPI, Next.js, and OpenRouter AI.</p>
+        <p>🤖 Generated with Claude Code &bull; Co-Authored-By: Claude Code &lt;noreply@anthropic.com&gt;</p>
+    </footer>
+
+</body>
+</html>
