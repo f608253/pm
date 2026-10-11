@@ -10,6 +10,47 @@
   --surface-strong: #ffffff;
   --stroke: rgba(3, 33, 71, 0.08);
   --shadow: 0 18px 40px rgba(3, 33, 71, 0.12);
+
+  --col-1-bg: #fff3e0;
+  --col-1-border: #ffb74d;
+  --col-1-text: #e65100;
+  --col-2-bg: #e3f2fd;
+  --col-2-border: #64b5f6;
+  --col-2-text: #0d47a1;
+  --col-3-bg: #fce4ec;
+  --col-3-border: #f06292;
+  --col-3-text: #880e4f;
+  --col-4-bg: #e8f5e9;
+  --col-4-border: #81c784;
+  --col-4-text: #1b5e20;
+  --col-5-bg: #f3e5f5;
+  --col-5-border: #ba68c8;
+  --col-5-text: #4a148c;
+
+  --ai-news-bg: #fff8e1;
+  --ai-news-border: #ffd54f;
+  --ai-news-text: #f57f17;
+  --ai-summary-bg: #e3f2fd;
+  --ai-summary-border: #42a5f5;
+  --ai-summary-text: #0d47a1;
+  --ai-workflow-bg: #fce4ec;
+  --ai-workflow-border: #ec407a;
+  --ai-workflow-text: #880e4f;
+  --ai-risk-bg: #fff3e0;
+  --ai-risk-border: #ff9800;
+  --ai-risk-text: #e65100;
+  --ai-effort-bg: #e8f5e9;
+  --ai-effort-border: #66bb6a;
+  --ai-effort-text: #1b5e20;
+  --ai-retro-bg: #f3e5f5;
+  --ai-retro-border: #ab47bc;
+  --ai-retro-text: #4a148c;
+  --ai-standup-bg: #e0f2f1;
+  --ai-standup-border: #4db6ac;
+  --ai-standup-text: #004d40;
+  --ai-weekly-bg: #fbe9e7;
+  --ai-weekly-border: #ff7043;
+  --ai-weekly-text: #bf360c;
 }
 
 @theme inline {
@@ -31,4 +72,19 @@ body {
 
 .font-display {
   font-family: var(--font-display), "Segoe UI", sans-serif;
+}
+
+@keyframes ai-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-ai-pulse {
+  animation: ai-pulse 1.4s infinite ease-in-out;
 }

@@ -77,16 +77,20 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
       }}
       className={
         open
-          ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-0 flex-col border-l border-[var(--stroke)] bg-white shadow-[var(--shadow)] transition-transform duration-300"
-          : "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-full flex-col border-l border-[var(--stroke)] bg-white shadow-[var(--shadow)] transition-transform duration-300"
+          ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-0 flex-col shadow-[var(--shadow)] transition-transform duration-300"
+          : "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-full flex-col shadow-[var(--shadow)] transition-transform duration-300"
       }
+      style={{
+        borderLeftColor: "var(--ai-workflow-border)",
+        backgroundColor: "var(--ai-workflow-bg)",
+      }}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-[var(--stroke)] px-4 py-4">
+      <header className="flex items-center justify-between gap-3 border-b px-4 py-4" style={{ borderColor: "var(--ai-workflow-border)" }}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "var(--ai-workflow-text)" }}>
             Optimization
           </p>
-          <p className="font-display text-lg font-semibold text-[var(--navy-dark)]">
+          <p className="font-display text-lg font-semibold" style={{ color: "var(--ai-workflow-text)" }}>
             Workflow
           </p>
         </div>
@@ -95,7 +99,8 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
             type="button"
             onClick={() => void load()}
             disabled={loading}
-            className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)] disabled:opacity-40"
+            className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] transition disabled:opacity-40"
+            style={{ borderColor: "var(--ai-workflow-border)", color: "var(--ai-workflow-text)" }}
           >
             Refresh
           </button>
@@ -103,7 +108,8 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
             type="button"
             onClick={onClose}
             aria-controls="workflow-panel"
-            className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)]"
+            className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] transition"
+            style={{ borderColor: "var(--ai-workflow-border)", color: "var(--ai-workflow-text)" }}
           >
             Close
           </button>
@@ -112,43 +118,45 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-4">
         {loading ? (
-          <p className="text-sm text-[var(--gray-text)]">Analyzing workflow...</p>
+          <p className="text-sm" style={{ color: "var(--ai-workflow-text)" }}>Analyzing workflow...</p>
         ) : error ? (
           <div>
-            <p role="alert" className="text-sm font-medium text-[var(--secondary-purple)]">
+            <p role="alert" className="text-sm font-medium" style={{ color: "var(--ai-workflow-text)" }}>
               {error}
             </p>
             <button
               type="button"
               onClick={() => void load()}
-              className="mt-4 rounded-2xl bg-[var(--secondary-purple)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              className="mt-4 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              style={{ backgroundColor: "var(--ai-workflow-border)" }}
             >
               Try again
             </button>
           </div>
         ) : result === null ? (
-          <p className="text-sm text-[var(--gray-text)]">No workflow data available.</p>
+          <p className="text-sm" style={{ color: "var(--ai-workflow-text)" }}>No workflow data available.</p>
         ) : isEmpty ? (
-          <p className="text-sm text-[var(--gray-text)]">
+          <p className="text-sm" style={{ color: "var(--ai-workflow-text)" }}>
             Nothing to recommend. The board looks healthy.
           </p>
         ) : (
           <>
             {result.next_actions.length > 0 ? (
               <section aria-label="Next best action">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-workflow-text)" }}>
                   Next best action
                 </h2>
                 <ul className="mt-2 flex flex-col gap-3">
                   {result.next_actions.map((item) => (
                     <li
                       key={item.card_id}
-                      className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] p-3"
+                      className="rounded-2xl border p-3"
+                      style={{ borderColor: "var(--ai-workflow-border)", backgroundColor: "var(--ai-workflow-bg)" }}
                     >
-                      <p className="text-sm font-semibold text-[var(--navy-dark)]">
+                      <p className="text-sm font-semibold" style={{ color: "var(--ai-workflow-text)" }}>
                         {item.card_title}
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-[var(--gray-text)]">
+                      <p className="mt-1 text-sm leading-6" style={{ color: "var(--ai-workflow-text)" }}>
                         {item.action}
                       </p>
                     </li>
@@ -159,19 +167,20 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
 
             {result.bottlenecks.length > 0 ? (
               <section aria-label="Bottlenecks">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-workflow-text)" }}>
                   Bottlenecks
                 </h2>
                 <ul className="mt-2 flex flex-col gap-3">
                   {result.bottlenecks.map((item) => (
                     <li
                       key={item.column_id}
-                      className="rounded-2xl border border-[var(--accent-yellow)] bg-[var(--surface)] p-3"
+                      className="rounded-2xl border p-3"
+                      style={{ borderColor: "var(--ai-workflow-border)", backgroundColor: "var(--ai-workflow-bg)" }}
                     >
-                      <p className="text-sm font-semibold text-[var(--navy-dark)]">
+                      <p className="text-sm font-semibold" style={{ color: "var(--ai-workflow-text)" }}>
                         {item.title}
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-[var(--gray-text)]">
+                      <p className="mt-1 text-sm leading-6" style={{ color: "var(--ai-workflow-text)" }}>
                         {item.reason}
                       </p>
                     </li>
@@ -182,25 +191,27 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
 
             {order.length > 0 ? (
               <section aria-label="Suggested order">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-workflow-text)" }}>
                   Suggested order
                 </h2>
                 <ul className="mt-2 flex flex-col gap-3">
                   {order.map(([columnId, cardIds]) => (
                     <li
                       key={columnId}
-                      className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] p-3"
+                      className="rounded-2xl border p-3"
+                      style={{ borderColor: "var(--ai-workflow-border)", backgroundColor: "var(--ai-workflow-bg)" }}
                     >
-                      <p className="text-sm font-semibold text-[var(--navy-dark)]">
+                      <p className="text-sm font-semibold" style={{ color: "var(--ai-workflow-text)" }}>
                         {columns.get(Number(columnId)) ?? `Column ${columnId}`}
                       </p>
                       <ol className="mt-2 flex flex-col gap-1">
                         {cardIds.map((cardId, index) => (
                           <li
                             key={cardId}
-                            className="flex gap-2 text-sm leading-6 text-[var(--gray-text)]"
+                            className="flex gap-2 text-sm leading-6"
+                            style={{ color: "var(--ai-workflow-text)" }}
                           >
-                            <span className="font-semibold text-[var(--primary-blue)]">
+                            <span className="font-semibold" style={{ color: "var(--ai-workflow-border)" }}>
                               {index + 1}.
                             </span>
                             {titles.get(cardId) ?? `Card ${cardId}`}
@@ -215,10 +226,10 @@ export const WorkflowPanel = ({ open, onClose, board }: Props) => {
 
             {result.suggestions.length > 0 ? (
               <section aria-label="Suggestions">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-workflow-text)" }}>
                   Suggestions
                 </h2>
-                <ul className="mt-2 list-disc pl-4 text-sm leading-6 text-[var(--navy-dark)]">
+                <ul className="mt-2 list-disc pl-4 text-sm leading-6" style={{ color: "var(--ai-workflow-text)" }}>
                   {result.suggestions.map((item, idx) => (
                     <li key={idx}>{item}</li>
                   ))}

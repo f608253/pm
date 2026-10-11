@@ -52,6 +52,18 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
   const [retroOpen, setRetroOpen] = useState(false);
   const [standupOpen, setStandupOpen] = useState(false);
   const [weeklyOpen, setWeeklyOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  const anyPanelOpen =
+    newsOpen ||
+    summaryOpen ||
+    workflowOpen ||
+    riskOpen ||
+    effortOpen ||
+    retroOpen ||
+    standupOpen ||
+    weeklyOpen ||
+    chatOpen;
 
   const renameTimers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
 
@@ -284,7 +296,11 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
       <div className="pointer-events-none absolute left-0 top-0 h-[420px] w-[420px] -translate-x-1/3 -translate-y-1/3 rounded-full bg-[radial-gradient(circle,_rgba(32,157,215,0.25)_0%,_rgba(32,157,215,0.05)_55%,_transparent_70%)]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-[520px] w-[520px] translate-x-1/4 translate-y-1/4 rounded-full bg-[radial-gradient(circle,_rgba(117,57,145,0.18)_0%,_rgba(117,57,145,0.05)_55%,_transparent_75%)]" />
 
-      <main className="relative mx-auto flex min-h-screen max-w-[1500px] flex-col gap-10 px-6 pb-16 pt-12">
+      <main
+        className={`relative mx-auto flex min-h-screen max-w-[1700px] flex-col gap-10 px-6 pb-16 pt-12 transition-all duration-300 ${
+          anyPanelOpen ? "lg:mr-[440px]" : ""
+        }`}
+      >
         <header className="flex flex-col gap-6 rounded-[32px] border border-[var(--stroke)] bg-white/80 p-8 shadow-[var(--shadow)] backdrop-blur">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div>
@@ -348,56 +364,64 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
               <button
                 type="button"
                 onClick={() => setNewsOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-news-border)", backgroundColor: "var(--ai-news-bg)", color: "var(--ai-news-text)" }}
               >
                 AI News
               </button>
               <button
                 type="button"
                 onClick={() => setSummaryOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-summary-border)", backgroundColor: "var(--ai-summary-bg)", color: "var(--ai-summary-text)" }}
               >
                 Daily Summary
               </button>
               <button
                 type="button"
                 onClick={() => setWorkflowOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-workflow-border)", backgroundColor: "var(--ai-workflow-bg)", color: "var(--ai-workflow-text)" }}
               >
                 Workflow
               </button>
               <button
                 type="button"
                 onClick={() => setRiskOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-risk-border)", backgroundColor: "var(--ai-risk-bg)", color: "var(--ai-risk-text)" }}
               >
                 Risk Assessment
               </button>
               <button
                 type="button"
                 onClick={() => setEffortOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-effort-border)", backgroundColor: "var(--ai-effort-bg)", color: "var(--ai-effort-text)" }}
               >
                 Effort Estimate
               </button>
               <button
                 type="button"
                 onClick={() => setRetroOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-retro-border)", backgroundColor: "var(--ai-retro-bg)", color: "var(--ai-retro-text)" }}
               >
                 Retrospective
               </button>
               <button
                 type="button"
                 onClick={() => setStandupOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-standup-border)", backgroundColor: "var(--ai-standup-bg)", color: "var(--ai-standup-text)" }}
               >
                 Standup
               </button>
               <button
                 type="button"
                 onClick={() => setWeeklyOpen(true)}
-                className="rounded-full border border-[var(--stroke)] bg-white px-3 py-1.5 text-xs font-semibold text-[var(--navy-dark)] hover:border-[var(--primary-blue)] hover:text-[var(--primary-blue)] transition"
+                className="rounded-full border-2 px-3 py-1.5 text-xs font-semibold transition"
+                style={{ borderColor: "var(--ai-weekly-border)", backgroundColor: "var(--ai-weekly-bg)", color: "var(--ai-weekly-text)" }}
               >
                 Weekly Report
               </button>
@@ -412,7 +436,7 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
           onDragEnd={handleDragEnd}
         >
           <section className="grid gap-6 lg:grid-cols-5">
-            {board.columns.map((column) => (
+            {board.columns.map((column, index) => (
               <KanbanColumn
                 key={column.id}
                 column={column}
@@ -421,6 +445,7 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
                 onDeleteCard={handleDeleteCard}
                 onUpdateCard={handleUpdateCard}
                 boardId={board.id}
+                index={index}
               />
             ))}
           </section>
@@ -433,7 +458,13 @@ export const KanbanBoard = ({ username, onLogout }: KanbanBoardProps) => {
           </DragOverlay>
         </DndContext>
 
-         <ChatSidebar board={board} onBoardChange={setBoard} showToggle={false} />
+         <ChatSidebar
+           board={board}
+           onBoardChange={setBoard}
+           showToggle={false}
+           open={chatOpen}
+           onOpenChange={setChatOpen}
+         />
          <AINewsPanel open={newsOpen} onClose={() => setNewsOpen(false)} />
          <DailySummaryPanel open={summaryOpen} onClose={() => setSummaryOpen(false)} boardId={board.id} />
          <WorkflowPanel open={workflowOpen} onClose={() => setWorkflowOpen(false)} board={board} />

@@ -60,16 +60,20 @@ export const EffortEstimationPanel = ({ open, onClose, board }: Props) => {
       }}
       className={
         open
-          ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-0 flex-col border-l border-[var(--stroke)] bg-white shadow-[var(--shadow)] transition-transform duration-300"
-          : "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-full flex-col border-l border-[var(--stroke)] bg-white shadow-[var(--shadow)] transition-transform duration-300"
+          ? "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-0 flex-col shadow-[var(--shadow)] transition-transform duration-300"
+          : "fixed inset-y-0 right-0 z-40 flex w-full max-w-[420px] translate-x-full flex-col shadow-[var(--shadow)] transition-transform duration-300"
       }
+      style={{
+        borderLeftColor: "var(--ai-effort-border)",
+        backgroundColor: "var(--ai-effort-bg)",
+      }}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-[var(--stroke)] px-4 py-4">
+      <header className="flex items-center justify-between gap-3 border-b px-4 py-4" style={{ borderColor: "var(--ai-effort-border)" }}>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[var(--gray-text)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "var(--ai-effort-text)" }}>
             Smart Summary
           </p>
-          <p className="font-display text-lg font-semibold text-[var(--navy-dark)]">
+          <p className="font-display text-lg font-semibold" style={{ color: "var(--ai-effort-text)" }}>
             Effort Estimation
           </p>
         </div>
@@ -78,7 +82,8 @@ export const EffortEstimationPanel = ({ open, onClose, board }: Props) => {
             type="button"
             onClick={() => void load()}
             disabled={loading}
-            className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)] disabled:opacity-40"
+            className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] transition disabled:opacity-40"
+            style={{ borderColor: "var(--ai-effort-border)", color: "var(--ai-effort-text)" }}
           >
             Refresh
           </button>
@@ -86,7 +91,8 @@ export const EffortEstimationPanel = ({ open, onClose, board }: Props) => {
             type="button"
             onClick={onClose}
             aria-controls="effort-panel"
-            className="rounded-full border border-[var(--stroke)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--navy-dark)] transition hover:border-[var(--secondary-purple)] hover:text-[var(--secondary-purple)]"
+            className="rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.15em] transition"
+            style={{ borderColor: "var(--ai-effort-border)", color: "var(--ai-effort-text)" }}
           >
             Close
           </button>
@@ -95,58 +101,60 @@ export const EffortEstimationPanel = ({ open, onClose, board }: Props) => {
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-4">
         {loading ? (
-          <p className="text-sm text-[var(--gray-text)]">Estimating effort...</p>
+          <p className="text-sm" style={{ color: "var(--ai-effort-text)" }}>Estimating effort...</p>
         ) : error ? (
           <div>
-            <p role="alert" className="text-sm font-medium text-[var(--secondary-purple)]">
+            <p role="alert" className="text-sm font-medium" style={{ color: "var(--ai-effort-text)" }}>
               {error}
             </p>
             <button
               type="button"
               onClick={() => void load()}
-              className="mt-4 rounded-2xl bg-[var(--secondary-purple)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              className="mt-4 rounded-2xl px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              style={{ backgroundColor: "var(--ai-effort-border)" }}
             >
               Try again
             </button>
           </div>
         ) : result === null ? (
-          <p className="text-sm text-[var(--gray-text)]">No effort data available.</p>
+          <p className="text-sm" style={{ color: "var(--ai-effort-text)" }}>No effort data available.</p>
         ) : isEmpty ? (
-          <p className="text-sm text-[var(--gray-text)]">
+          <p className="text-sm" style={{ color: "var(--ai-effort-text)" }}>
             No estimates to show. The board looks healthy.
           </p>
         ) : (
           <>
             {result.summary ? (
               <section aria-label="Summary">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-effort-text)" }}>
                   Summary
                 </h2>
-                <p className="mt-2 whitespace-pre-line rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] p-4 text-sm leading-6 text-[var(--navy-dark)]">
+                <p className="mt-2 whitespace-pre-line rounded-2xl border p-4 text-sm leading-6" style={{ borderColor: "var(--ai-effort-border)", backgroundColor: "var(--ai-effort-bg)", color: "var(--ai-effort-text)" }}>
                   {result.summary}
                 </p>
               </section>
             ) : null}
             <section aria-label="Estimates">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gray-text)]">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--ai-effort-text)" }}>
                 Estimates
               </h2>
               <ul className="mt-2 flex flex-col gap-3">
                 {result.estimates.map((item) => (
                   <li
                     key={item.card_id}
-                    className="rounded-2xl border border-[var(--stroke)] bg-[var(--surface)] p-3"
+                    className="rounded-2xl border p-3"
+                    style={{ borderColor: "var(--ai-effort-border)", backgroundColor: "var(--ai-effort-bg)" }}
                   >
-                    <p className="text-sm font-semibold text-[var(--navy-dark)]">
+                    <p className="text-sm font-semibold" style={{ color: "var(--ai-effort-text)" }}>
                       {item.card_title}
                     </p>
-                    <p className="mt-1 text-sm leading-6 text-[var(--gray-text)]">
-                      <span className="font-semibold text-[var(--navy-dark)]">Effort:</span>{" "}
+                    <p className="mt-1 text-sm leading-6" style={{ color: "var(--ai-effort-text)" }}>
+                      <span className="font-semibold">Effort:</span>{" "}
                       {item.effort}
                     </p>
                     {item.hint ? (
-                      <p className="mt-1 text-sm leading-6 text-[var(--gray-text)]">
-                        <span className="font-semibold text-[var(--navy-dark)]">Hint:</span>{" "}
+                      <p className="mt-1 text-sm leading-6" style={{ color: "var(--ai-effort-text)" }}>
+                        <span className="font-semibold">Hint:</span>{" "}
                         {item.hint}
                       </p>
                     ) : null}

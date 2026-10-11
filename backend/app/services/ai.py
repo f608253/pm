@@ -253,8 +253,7 @@ Reply with a single JSON object and nothing else:
 
 Rules:
 - generate_details: put the finished card body in "details" as markdown bullet
-  points. Start with a one line summary, then an "Acceptance criteria" list of
-  concrete, checkable conditions. Leave "priority" and "duplicates" empty.
+  points. Keep the entire description extremely precise, concise, and brief (10-15 words total). Start with a short summary, then brief acceptance criteria. Leave "priority" and "duplicates" empty.
 - suggest_priority: set "priority" from the card wording (blocking, security,
   customer facing, deadline words rank high) and the board state (cards blocking
   several others, or sitting in a late stage, rank higher). Leave "details" and

@@ -105,7 +105,14 @@ export const CardActionsMenu = ({ cardId, boardId, onUpdateCard }: Props) => {
       ) : null}
 
       {loading ? (
-        <p className="mt-2 text-xs text-[var(--gray-text)]">Thinking...</p>
+        <div className="mt-2 flex items-center gap-2 text-xs text-[var(--gray-text)]">
+          <div className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--secondary-purple)] animate-ai-pulse" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--secondary-purple)] animate-ai-pulse [animation-delay:0.2s]" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--secondary-purple)] animate-ai-pulse [animation-delay:0.4s]" />
+          </div>
+          <span className="font-medium">AI generating description...</span>
+        </div>
       ) : null}
 
       {error ? (

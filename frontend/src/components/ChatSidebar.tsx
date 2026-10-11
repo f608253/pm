@@ -13,6 +13,8 @@ type Props = {
   board: Board;
   onBoardChange: (board: Board) => void;
   showToggle?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 const SWIPE_CLOSE_THRESHOLD = 80;
@@ -20,8 +22,24 @@ const SWIPE_CLOSE_THRESHOLD = 80;
 let counter = 0;
 const nextId = () => `m${(counter += 1)}`;
 
-export const ChatSidebar = ({ board, onBoardChange, showToggle = true }: Props) => {
-  const [open, setOpen] = useState(false);
+export const ChatSidebar = ({
+  board,
+  onBoardChange,
+  showToggle = true,
+  open: propOpen,
+  onOpenChange: propOnOpenChange,
+}: Props) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = propOpen !== undefined ? propOpen : internalOpen;
+  const setOpen = (value: boolean | ((prev: boolean) => boolean)) => {
+    const next = typeof value === "function" ? value(open) : value;
+    if (propOnOpenChange) {
+      propOnOpenChange(next);
+    }
+    if (propOpen === undefined) {
+      setInternalOpen(next);
+    }
+  };
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
