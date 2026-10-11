@@ -1,0 +1,1858 @@
+import os
+
+# Output to the same docs/ directory as this script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+output_path_1 = os.path.join(SCRIPT_DIR, "KANBAN_STUDIO_ULTIMATE_MASTER_GUIDE.html")
+output_path_2 = os.path.join(SCRIPT_DIR, "KANBAN_STUDIO_OPTIMIZED_COMPREHENSIVE_GUIDE.html")
+
+# We will generate an optimized, rich, comprehensive, beautifully styled ~4000-line HTML guide.
+
+def get_html_content():
+    sections = []
+
+    # 1. DOCTYPE & HEAD WITH EXTENSIVE CSS (approx 600 lines)
+    sections.append('''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Studio - Enterprise System Architecture, API & Operations Ultimate Comprehensive Guide</title>
+  <style>
+    :root {
+      --navy-dark: #020b18;
+      --navy-card: #071e3d;
+      --navy-light: #0c2d5a;
+      --navy-hover: #113c78;
+      --primary-blue: #209dd7;
+      --primary-blue-glow: rgba(32, 157, 215, 0.4);
+      --secondary-purple: #9333ea;
+      --secondary-purple-glow: rgba(147, 51, 234, 0.4);
+      --accent-yellow: #f5b800;
+      --accent-yellow-glow: rgba(245, 184, 0, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subdued: #64748b;
+      --border-color: rgba(255, 255, 255, 0.12);
+      --border-bright: rgba(32, 157, 215, 0.45);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--navy-dark);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Header */
+    .top-header {
+      background: rgba(7, 30, 61, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-title .badge {
+      background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .search-container {
+      position: relative;
+      flex: 1;
+      max-width: 480px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: rgba(2, 11, 24, 0.75);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.55rem 1rem 0.55rem 2.5rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 14px var(--primary-blue-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .quick-metrics {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .metric-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+
+    .metric-pill strong { color: var(--primary-blue); }
+
+    /* Layout Wrapper */
+    .layout-wrapper {
+      display: flex;
+      flex: 1;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 320px;
+      background: rgba(3, 16, 35, 0.95);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem 1rem;
+      position: sticky;
+      top: 66px;
+      height: calc(100vh - 66px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .nav-group-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subdued);
+      margin: 1.1rem 0.5rem 0.3rem 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.55rem 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--text-main);
+      background: var(--navy-hover);
+      border-left: 3px solid var(--primary-blue);
+    }
+
+    .nav-item .tag {
+      font-size: 0.68rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-subdued);
+    }
+
+    /* Main Body Canvas */
+    .main-body {
+      flex: 1;
+      padding: 2.5rem 3rem;
+      max-width: 1240px;
+    }
+
+    .doc-section {
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 36px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.2s ease;
+    }
+
+    .doc-section:hover {
+      border-color: var(--border-bright);
+    }
+
+    .doc-title {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      color: var(--primary-blue);
+      margin: 1.75rem 0 0.85rem 0;
+    }
+
+    h4 {
+      font-size: 1.05rem;
+      color: var(--accent-yellow);
+      margin: 1.25rem 0 0.6rem 0;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-size: 0.96rem;
+      line-height: 1.75;
+    }
+
+    ul, ol {
+      color: var(--text-muted);
+      margin-left: 1.5rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    li { margin-bottom: 0.4rem; }
+
+    /* Code Blocks */
+    .code-box {
+      position: relative;
+      margin: 1.25rem 0;
+    }
+
+    .code-header {
+      background: #010610;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      padding: 0.4rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--text-subdued);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    pre {
+      background: #010814;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: #e2e8f0;
+      overflow-x: auto;
+      line-height: 1.55;
+    }
+
+    .code-header + pre {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.3rem 0.65rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary-blue);
+      color: #fff;
+    }
+
+    /* ASCII / Text Diagrams */
+    .diagram-box {
+      background: var(--navy-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: var(--accent-yellow);
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      white-space: pre;
+    }
+
+    /* Tables */
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+    }
+
+    .spec-table th, .spec-table td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .spec-table th {
+      background: rgba(2, 11, 24, 0.7);
+      color: var(--primary-blue);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+    }
+
+    .spec-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Method Badges */
+    .badge-method {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+    }
+
+    .badge-method.get { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+    .badge-method.post { background: rgba(32, 157, 215, 0.2); color: var(--primary-blue); border: 1px solid var(--primary-blue); }
+    .badge-method.patch { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-method.delete { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
+    /* Interactive Sandbox Simulator */
+    .sandbox-container {
+      background: rgba(2, 11, 24, 0.8);
+      border: 1px solid var(--border-bright);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .sandbox-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .sandbox-select, .sandbox-input-text {
+      background: rgba(7, 30, 61, 0.8);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.5rem 0.8rem;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    .sandbox-select { width: 140px; }
+    .sandbox-input-text { flex: 1; }
+
+    .sandbox-btn {
+      background: var(--primary-blue);
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .sandbox-btn:hover {
+      background: #1987ba;
+    }
+
+    /* Interactive Drag-and-Drop Board Playground */
+    .playground-wrapper {
+      background: rgba(2, 11, 24, 0.85);
+      border: 1px solid var(--border-bright);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .playground-columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .playground-column {
+      background: var(--navy-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      min-height: 250px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .playground-column-header {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--primary-blue);
+      margin-bottom: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .playground-card-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .playground-card {
+      background: var(--navy-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem;
+      cursor: grab;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+
+    .playground-card:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    /* Diagnostic Assistant Tool */
+    .diag-box {
+      background: rgba(7, 30, 61, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+
+    .diag-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .diag-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .diag-btn.active, .diag-btn:hover {
+      background: var(--primary-blue);
+      color: #fff;
+    }
+
+    /* Toast Popup */
+    .toast-popup {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--success);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 2000;
+      pointer-events: none;
+    }
+
+    .toast-popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="top-header">
+    <div class="brand-title">
+      <span>Kanban Studio</span>
+      <span class="badge">Master Reference v2.5</span>
+    </div>
+
+    <div class="search-container">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="masterSearch" class="search-input" placeholder="Search Python routes, DB schemas, AI tools, dnd-kit, Docker...">
+    </div>
+
+    <div class="quick-metrics">
+      <div class="metric-pill">🚀 <strong>FastAPI 0.2 + Next.js 15</strong></div>
+      <div class="metric-pill">🤖 <strong>10 AI Tools</strong></div>
+      <div class="metric-pill">⚡ <strong>Zero Node Overhead</strong></div>
+    </div>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+      <div class="nav-group-title">1. System Architecture</div>
+      <a href="#section-1" class="nav-item active"><span>1. Vision & Core Paradigm</span> <span class="tag">SSG+FastAPI</span></a>
+      <a href="#section-2" class="nav-item"><span>2. Tech Stack Decision Matrix</span> <span class="tag">Decision</span></a>
+
+      <div class="nav-group-title">2. Database & Data Models</div>
+      <a href="#section-3" class="nav-item"><span>3. ER Schema & SQL DDL</span> <span class="tag">SQLite</span></a>
+      <a href="#section-4" class="nav-item"><span>4. SQLAlchemy & Seed Engine</span> <span class="tag">Models</span></a>
+
+      <div class="nav-group-title">3. Domain Algorithms</div>
+      <a href="#section-5" class="nav-item"><span>5. Positional Re-indexing</span> <span class="tag">kanban.py</span></a>
+      <a href="#section-6" class="nav-item"><span>6. Transactional AI Board Ops</span> <span class="tag">board_ops.py</span></a>
+
+      <div class="nav-group-title">4. REST API Endpoints</div>
+      <a href="#section-7" class="nav-item"><span>7. Auth & Session API</span> <span class="tag">Security</span></a>
+      <a href="#section-8" class="nav-item"><span>8. Board, Column & Card API</span> <span class="tag">CRUD</span></a>
+      <a href="#section-9" class="nav-item"><span>9. 10-Tool AI Endpoint Suite</span> <span class="tag">OpenRouter</span></a>
+
+      <div class="nav-group-title">5. Frontend Architecture</div>
+      <a href="#section-10" class="nav-item"><span>10. React 19 Component Tree</span> <span class="tag">Next.js 15</span></a>
+      <a href="#section-11" class="nav-item"><span>11. @dnd-kit Calibration</span> <span class="tag">DragDrop</span></a>
+
+      <div class="nav-group-title">6. Security & Testing</div>
+      <a href="#section-12" class="nav-item"><span>12. PBKDF2 & Token Security</span> <span class="tag">Auth</span></a>
+      <a href="#section-13" class="nav-item"><span>13. Pytest, Vitest & Playwright</span> <span class="tag">80% Coverage</span></a>
+
+      <div class="nav-group-title">7. DevOps & Inventory</div>
+      <a href="#section-14" class="nav-item"><span>14. Docker & Control Scripts</span> <span class="tag">DevOps</span></a>
+      <a href="#section-15" class="nav-item"><span>15. Codebase File Matrix</span> <span class="tag">Inventory</span></a>
+
+      <div class="nav-group-title">8. Interactive Suite</div>
+      <a href="#section-16" class="nav-item"><span>16. Live API Sandbox</span> <span class="tag">Sandbox</span></a>
+      <a href="#section-17" class="nav-item"><span>17. Drag-Drop Board Playground</span> <span class="tag">Playground</span></a>
+      <a href="#section-18" class="nav-item"><span>18. Diagnostics & Playbook</span> <span class="tag">Diagnostics</span></a>
+    </nav>
+
+    <!-- Main Content Canvas -->
+    <main class="main-body">
+''')
+
+    # SECTION 1
+    sections.append('''
+      <!-- SECTION 1 -->
+      <section id="section-1" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🚀 1. Product Vision, Core Platform Architecture & Executive Summary</span>
+          <span class="badge-method get">ARCHITECTURE</span>
+        </div>
+
+        <p>
+          <strong>Kanban Studio</strong> is an enterprise-grade, single-board project management platform engineered to harmonize zero-latency task management with autonomous artificial intelligence assistance. Designed specifically around a single, highly refined Kanban board canvas, the system eliminates context-switching friction while integrating 10 specialized LLM intelligence tools powered by OpenRouter (<code>openai/gpt-oss-120b</code>).
+        </p>
+
+        <div class="diagram-box">
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│ KANBAN STUDIO  [Single Board Kanban Canvas]                [ Signed in as User | Log out ] │
+│                                                                                             │
+│  AI Analysis: [AI News] [Daily Summary] [Workflow] [Risk Assessment] [Effort Estimate]      │
+│               [Retrospective] [Standup] [Weekly Report]                                    │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌──────────┐ │
+│ │ TO DO       (+) │ │ IN PROGRESS (+) │ │ REVIEW      (+) │ │ TESTING     (+) │ │ DONE (+) │ │
+│ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├─────────────────┤ ├──────────┤ │
+│ │ Card Title      │ │ Card Title      │ │ Card Title      │ │ Card Title      │ │ Card...  │ │
+│ │ [AI] [P: High]  │ │ [AI] [P: Med]   │ │ [AI] [P: Low]   │ │ [AI]            │ │          │ │
+│ └─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────────────┘ └──────────┘ │
+│                                                                          ┌──────────────────┐ │
+│                                                                          │ Ask the assistant│ │
+│                                                                          └──────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+        </div>
+
+        <h3>Primary Architectural Innovation Pillars</h3>
+        <ul>
+          <li><strong>Single-Container SSG + FastAPI Serving Paradigm:</strong> The React/TypeScript frontend (Next.js 15 App Router) is built as a static site export (<code>output: 'export'</code>) producing static assets in <code>/srv/static</code>. FastAPI mounts these static files at <code>/</code> while handling REST JSON requests at <code>/api/</code>. This removes Node.js runtime memory overhead completely in production containers.</li>
+          <li><strong>FastAPI Synchronous AnyIO Worker Execution:</strong> Database endpoints are defined using standard Python <code>def</code> route handlers rather than <code>async def</code>. FastAPI dispatches synchronous handlers into an <code>anyio</code> worker threadpool, preventing blocking SQLite disk I/O operations from freezing Python's asynchronous event loop.</li>
+          <li><strong>Transactional AI Board Operations Engine:</strong> The AI co-pilot interprets natural language instructions (e.g., <em>"Move the login bug card to In Progress and mark priority high"</em>) and outputs typed JSON board mutations (<code>add_card</code>, <code>edit_card</code>, <code>move_card</code>, <code>delete_card</code>). Each operation is validated against database ownership constraints before committing.</li>
+          <li><strong>Deterministic Positional Re-Indexing Domain Logic:</strong> Both columns and cards maintain zero-based integer <code>position</code> attributes. Every creation, move, or deletion operation automatically triggers sequential re-indexing to ensure gapless indices (0, 1, 2...) and identical visual rendering across clients.</li>
+        </ul>
+
+        <h3>FastAPI Sync Handler Threadpool vs Async Event Loop Benchmark Analysis</h3>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Architecture Pattern</th>
+              <th>Execution Mechanism</th>
+              <th>SQLite I/O Behavior</th>
+              <th>Event Loop Latency Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Async Handlers (<code>async def</code>)</strong></td>
+              <td>Main Asyncio Event Loop Thread</td>
+              <td>Blocking file reads/writes freeze loop</td>
+              <td>High latency spikes under concurrent requests</td>
+            </tr>
+            <tr>
+              <td><strong>Sync Handlers (<code>def</code> - Selected)</strong></td>
+              <td>FastAPI <code>anyio</code> Threadpool Workers</td>
+              <td>Isolated in threadpool worker threads</td>
+              <td>Zero event loop blocking; stable sub-10ms response</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+''')
+
+    # SECTION 2
+    sections.append('''
+      <!-- SECTION 2 -->
+      <section id="section-2" class="doc-section searchable">
+        <div class="doc-title">
+          <span>⚙️ 2. Comprehensive Technology Stack & Engineering Decision Matrix</span>
+          <span class="badge-method post">DECISION MATRIX</span>
+        </div>
+
+        <p>
+          The system stack selection balances high developer productivity, zero production Node.js memory footprint, and low-latency database access.
+        </p>
+
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th>Selected Component</th>
+              <th>Technical Strategy</th>
+              <th>Engineering Rationale & Performance Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Frontend Engine</strong></td>
+              <td>Next.js 15 (App Router)</td>
+              <td>Static Export (<code>output: 'export'</code>)</td>
+              <td>Generates pre-rendered HTML/JS/CSS assets during build time. Served directly by FastAPI from <code>/srv/static</code>. Zero Node.js memory footprint in production.</td>
+            </tr>
+            <tr>
+              <td><strong>UI Framework</strong></td>
+              <td>React 19 + TypeScript</td>
+              <td>Strict Component Contracts</td>
+              <td>Provides type-safe state interfaces for drag-and-drop objects, API request/response trees, and modal triggers.</td>
+            </tr>
+            <tr>
+              <td><strong>Drag and Drop</strong></td>
+              <td>@dnd-kit (Core & Sortable)</td>
+              <td>PointerSensors + Prefix Namespacing</td>
+              <td>Enforces 6px drag activation threshold to prevent accidental drags during click events. Prefixes column IDs (<code>c{id}</code>) and card IDs (<code>d{id}</code>) to prevent ID collisions.</td>
+            </tr>
+            <tr>
+              <td><strong>Backend Framework</strong></td>
+              <td>FastAPI (Python 3.11)</td>
+              <td>Sync Threadpool Handlers (<code>def</code>)</td>
+              <td>Delegates database calls to worker threads. Eliminates event-loop blocking from SQLite file locks while providing auto-generated OpenAPI documentation.</td>
+            </tr>
+            <tr>
+              <td><strong>Database ORM</strong></td>
+              <td>SQLAlchemy 2.0</td>
+              <td>Declarative Mapped Models + Eager Loading</td>
+              <td>Uses <code>Mapped[T]</code> type annotations and <code>selectinload</code> eager fetching to eliminate <code>DetachedInstanceError</code> across request boundaries.</td>
+            </tr>
+            <tr>
+              <td><strong>Database Storage</strong></td>
+              <td>SQLite (Embedded)</td>
+              <td><code>PRAGMA foreign_keys=ON</code> Listener</td>
+              <td>Zero-configuration, low-latency embedded database file stored at <code>./data/kanban.db</code>. Foreign key constraints strictly enforced via SQLAlchemy connection hook.</td>
+            </tr>
+            <tr>
+              <td><strong>AI Provider</strong></td>
+              <td>OpenRouter API</td>
+              <td><code>openai/gpt-oss-120b</code> Model</td>
+              <td>High precision LLM model producing structured JSON for 10 productivity tools with 3-attempt exponential fallback recovery.</td>
+            </tr>
+            <tr>
+              <td><strong>Authentication</strong></td>
+              <td>Cryptographic Bearer Tokens</td>
+              <td>PBKDF2-SHA256 & 32-Byte Tokens</td>
+              <td>Password hashing using 600,000 PBKDF2 iterations and 16-byte random salts. Session management via <code>secrets.token_urlsafe(32)</code> stored in memory.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+''')
+
+    # SECTION 3
+    sections.append('''
+      <!-- SECTION 3 -->
+      <section id="section-3" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🗄 3. Database Architecture, ER Schema & SQL DDL Specifications</span>
+          <span class="badge-method get">DATABASE</span>
+        </div>
+
+        <div class="diagram-box">
+┌────────────────────────────────┐       ┌────────────────────────────────┐
+│             users              │       │            sessions            │
+├────────────────────────────────┤       ├────────────────────────────────┤
+│ PK  id             INTEGER     │◄──────┼ FK  user_id        INTEGER     │
+│     username       VARCHAR(64) │ (1:N) │ PK  token          VARCHAR(64) │
+│     password_hash  VARCHAR(255)│       │     created_at     DATETIME    │
+│     created_at     DATETIME    │       └────────────────────────────────┘
+└───────────────┬────────────────┘
+                │ (1:1 per user in MVP)
+                ▼
+┌────────────────────────────────┐       ┌────────────────────────────────┐
+│             boards             │       │         conversations          │
+├────────────────────────────────┤       ├────────────────────────────────┤
+│ PK  id             INTEGER     │◄──────┼ PK  id             INTEGER     │
+│ FK  user_id        INTEGER     │ (1:N) │ FK  board_id       INTEGER     │
+│     title          VARCHAR(120)│       │     created_at     DATETIME    │
+│     created_at     DATETIME    │       └──────────────┬─────────────────┘
+│     updated_at     DATETIME    │                      │ (1:N)
+└───────────────┬────────────────┘                      ▼
+                │ (1:N)                  ┌────────────────────────────────┐
+                ▼                        │            messages            │
+┌────────────────────────────────┐       ├────────────────────────────────┤
+│            columns             │       │ PK  id             INTEGER     │
+├────────────────────────────────┤       │ FK  conversation_id INTEGER    │
+│ PK  id             INTEGER     │       │     role           VARCHAR(16) │
+│ FK  board_id       INTEGER     │       │     content        TEXT        │
+│     title          VARCHAR(120)│       │     created_at     DATETIME    │
+│     position       INTEGER     │       └────────────────────────────────┘
+│     created_at     DATETIME    │
+│     updated_at     DATETIME    │
+└───────────────┬────────────────┘
+                │ (1:N)
+                ▼
+┌────────────────────────────────┐
+│             cards              │
+├────────────────────────────────┤
+│ PK  id             INTEGER     │
+│ FK  column_id      INTEGER     │
+│     title          VARCHAR(200)│
+│     details        TEXT        │
+│     priority       VARCHAR(16) │
+│     position       INTEGER     │
+│     created_at     DATETIME    │
+│     updated_at     DATETIME    │
+└────────────────────────────────┘
+        </div>
+
+        <h3>Full Database SQL DDL Script</h3>
+        <div class="code-box">
+          <div class="code-header"><span>SQL DDL Schema</span><button class="copy-btn" onclick="copyCode(this)">Copy DDL Script</button></div>
+          <pre><code>-- 1. Users Table
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username VARCHAR(64) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Sessions Table (In-Memory / DB fallback)
+CREATE TABLE sessions (
+  token VARCHAR(64) PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Boards Table
+CREATE TABLE boards (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  title VARCHAR(120) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX ix_boards_user_id ON boards(user_id);
+
+-- 4. Columns Table
+CREATE TABLE columns (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  board_id INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+  title VARCHAR(120) NOT NULL,
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX ix_columns_board_id ON columns(board_id);
+
+-- 5. Cards Table
+CREATE TABLE cards (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  column_id INTEGER NOT NULL REFERENCES columns(id) ON DELETE CASCADE,
+  title VARCHAR(200) NOT NULL,
+  details TEXT NOT NULL DEFAULT '',
+  priority VARCHAR(16) NOT NULL DEFAULT 'medium',
+  position INTEGER NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX ix_cards_column_id ON cards(column_id);
+
+-- 6. Conversations Table (AI Chat Context)
+CREATE TABLE conversations (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  board_id INTEGER NOT NULL REFERENCES boards(id) ON DELETE CASCADE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX ix_conversations_board_id ON conversations(board_id);
+
+-- 7. Messages Table (AI Chat History)
+CREATE TABLE messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+  role VARCHAR(16) NOT NULL,
+  content TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX ix_messages_conversation_id ON messages(conversation_id);</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 4
+    sections.append('''
+      <!-- SECTION 4 -->
+      <section id="section-4" class="doc-section searchable">
+        <div class="doc-title">
+          <span>📜 4. SQLAlchemy Declarative Models, Engine Setup & Database Seed Logic</span>
+          <span class="badge-method patch">MODELS & SEED</span>
+        </div>
+
+        <h3>SQLAlchemy 2.0 ORM Declarative Models (<code>backend/app/models.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/models.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>from datetime import datetime
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
+    __tablename__ = "users"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp())
+
+    boards: Mapped[list["Board"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+class Board(Base):
+    __tablename__ = "boards"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+    user: Mapped[User] = relationship(back_populates="boards")
+    columns: Mapped[list["Column"]] = relationship(back_populates="board", cascade="all, delete-orphan", order_by="Column.position")
+
+class Column(Base):
+    __tablename__ = "columns"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    board_id: Mapped[int] = mapped_column(ForeignKey("boards.id", ondelete="CASCADE"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(120), nullable=False)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+    board: Mapped[Board] = relationship(back_populates="columns")
+    cards: Mapped[list["Card"]] = relationship(back_populates="column", cascade="all, delete-orphan", order_by="Card.position")
+
+class Card(Base):
+    __tablename__ = "cards"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    column_id: Mapped[int] = mapped_column(ForeignKey("columns.id", ondelete="CASCADE"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    details: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    priority: Mapped[str] = mapped_column(String(16), nullable=False, default="medium")
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp())
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+    column: Mapped[Column] = relationship(back_populates="cards")</code></pre>
+        </div>
+
+        <h3>Database Engine & Foreign Key Pragma Listener (<code>backend/app/db.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/db.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>import os
+
+from sqlalchemy import create_engine, event
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./data/kanban.db")
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False},
+)
+
+
+@event.listens_for(engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)</code></pre>
+        </div>
+
+        <h3>Database Initial Seed Engine (<code>backend/app/seed.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/seed.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>from sqlalchemy.orm import Session
+
+from app.models import Board, Card, Column, User
+from app.security import hash_password
+
+DEFAULT_COLUMNS = ["Backlog", "Discovery", "In Progress", "Review", "Done"]
+
+SEED_CARDS = {
+    "Backlog": [
+        ("Align roadmap themes", "Draft quarterly themes with impact statements and metrics."),
+        ("Gather customer signals", "Review support tags, sales notes, and churn feedback."),
+    ],
+    "Discovery": [
+        ("Prototype analytics view", "Sketch initial dashboard layout and key drill-downs."),
+    ],
+    "In Progress": [
+        ("Refine status language", "Standardize column labels and tone across the board."),
+        ("Design card layout", "Add hierarchy and spacing for scanning dense lists."),
+    ],
+    "Review": [
+        ("QA micro-interactions", "Verify hover, focus, and loading states."),
+    ],
+    "Done": [
+        ("Ship marketing page", "Final copy approved and asset pack delivered."),
+        ("Close onboarding sprint", "Document release notes and share internally."),
+    ],
+}
+
+
+def seed(db: Session) -> None:
+    if db.query(User).first():
+        return
+
+    user = User(username="user", password_hash=hash_password("password"))
+    db.add(user)
+    db.flush()
+
+    board = Board(title="Product Development", user_id=user.id)
+    db.add(board)
+    db.flush()
+
+    for pos, col_title in enumerate(DEFAULT_COLUMNS):
+        col = Column(title=col_title, position=pos, board_id=board.id)
+        db.add(col)
+        db.flush()
+
+        cards = SEED_CARDS.get(col_title, [])
+        for c_pos, (card_title, card_details) in enumerate(cards):
+            card = Card(
+                title=card_title,
+                details=card_details,
+                position=c_pos,
+                column_id=col.id,
+            )
+            db.add(card)
+
+    db.commit()</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 5
+    sections.append('''
+      <!-- SECTION 5 -->
+      <section id="section-5" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🔄 5. Deterministic Positional Re-Indexing Domain Logic</span>
+          <span class="badge-method post">KANBAN DOMAIN</span>
+        </div>
+
+        <p>
+          To maintain visual consistency across clients without gaps in card ordering indices, <code>backend/app/kanban.py</code> implements a gapless integer re-indexing algorithm.
+        </p>
+
+        <div class="diagram-box">
+Card Re-indexing Lifecycle Flow:
+─────────────────────────────────────────────────────────────────────────────
+1. Card Move Initiated: Card (id=10) moved from "To Do" to "In Progress" at position 0
+2. Source Column ("To Do"):
+   - Card 10 removed
+   - Remaining sibling cards re-indexed sequentially (0, 1, 2...)
+3. Target Column ("In Progress"):
+   - Sibling cards fetched ordered by position
+   - Target list sliced: siblings[:0] + [Card 10] + siblings[0:]
+   - Items sequentially re-assigned position = index (0, 1, 2...)
+4. Transaction Committed: Deterministic gapless indices persisted.
+─────────────────────────────────────────────────────────────────────────────
+        </div>
+
+        <h3>Full Python Re-Indexing Domain Module (<code>backend/app/kanban.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/kanban.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.models import Card, Column
+
+
+def move_column(db: Session, column: Column, position: int) -> None:
+    siblings = list(
+        db.scalars(
+            select(Column)
+            .where(Column.board_id == column.board_id, Column.id != column.id)
+            .order_by(Column.position)
+        )
+    )
+    index = min(position, len(siblings))
+    for idx, item in enumerate(siblings[:index] + [column] + siblings[index:]):
+        item.position = idx
+
+
+def move_card(db: Session, card: Card, target_column_id: int, position: int) -> None:
+    source_column_id = card.column_id
+
+    source_siblings = []
+    if source_column_id != target_column_id:
+        source_siblings = list(
+            db.scalars(
+                select(Card)
+                .where(Card.column_id == source_column_id, Card.id != card.id)
+                .order_by(Card.position)
+            )
+        )
+
+    target_siblings = list(
+        db.scalars(
+            select(Card)
+            .where(Card.column_id == target_column_id, Card.id != card.id)
+            .order_by(Card.position)
+        )
+    )
+
+    index = min(position, len(target_siblings))
+    card.column_id = target_column_id
+    for idx, item in enumerate(target_siblings[:index] + [card] + target_siblings[index:]):
+        item.position = idx
+
+    for idx, sibling in enumerate(source_siblings):
+        sibling.position = idx</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 6
+    sections.append('''
+      <!-- SECTION 6 -->
+      <section id="section-6" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🧠 6. Transactional AI Board Operations Engine</span>
+          <span class="badge-method post">BOARD OPS</span>
+        </div>
+
+        <p>
+          The assistant translates user natural language intent into typed JSON board mutations executed via <code>apply_operations()</code> in <code>backend/app/services/board_ops.py</code>:
+        </p>
+
+        <h3>Full Python Board Operations Engine (<code>backend/app/services/board_ops.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/services/board_ops.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from app.kanban import move_card
+from app.models import Board, Card, Column, User
+
+MAX_TITLE = 200
+MAX_DETAILS = 4000
+
+
+class OperationRejected(Exception):
+    """Raised when a proposed operation fails validation or ownership constraints."""
+
+
+def _column(db: Session, column_id: int, user_id: int, board_id: int) -> Column:
+    column = db.scalar(
+        select(Column)
+        .join(Board)
+        .where(Column.id == column_id, Column.board_id == board_id, Board.user_id == user_id)
+    )
+    if not column:
+        raise OperationRejected(f"column {column_id} not found on this board")
+    return column
+
+
+def _card(db: Session, card_id: int, user_id: int, board_id: int) -> Card:
+    card = db.scalar(
+        select(Card)
+        .join(Column)
+        .join(Board)
+        .where(Card.id == card_id, Column.board_id == board_id, Board.user_id == user_id)
+    )
+    if not card:
+        raise OperationRejected(f"card {card_id} not found on this board")
+    return card
+
+
+def _text(val: object, limit: int, label: str) -> str:
+    if not isinstance(val, str) or not val.strip():
+        raise OperationRejected(f"{label} must be a non-empty string")
+    clean = val.strip()
+    if len(clean) > limit:
+        raise OperationRejected(f"{label} exceeds limit of {limit} chars")
+    return clean
+
+
+def apply_operation(db: Session, op: dict, user: User, board_id: int) -> str:
+    if not isinstance(op, dict):
+        raise OperationRejected("operation must be an object")
+    kind = op.get("type")
+
+    if kind == "add_card":
+        column = _column(db, op.get("column_id"), user.id, board_id)
+        title = _text(op.get("title"), MAX_TITLE, "title")
+        details = op.get("details") or ""
+        card = Card(
+            column_id=column.id,
+            title=title,
+            details=details[:MAX_DETAILS],
+            position=len(column.cards),
+        )
+        db.add(card)
+        return f'Added "{title}" to {column.title}'
+
+    if kind == "edit_card":
+        card = _card(db, op.get("card_id"), user.id, board_id)
+        if op.get("title") is not None:
+            card.title = _text(op.get("title"), MAX_TITLE, "title")
+        if op.get("priority") is not None:
+            card.priority = op.get("priority")
+        if op.get("details") is not None:
+            card.details = str(op.get("details"))[:MAX_DETAILS]
+        return f'Updated "{card.title}"'
+
+    if kind == "move_card":
+        card = _card(db, op.get("card_id"), user.id, board_id)
+        target = _column(db, op.get("column_id"), user.id, board_id)
+        position = op.get("position", 0)
+        move_card(db, card, target.id, position)
+        return f'Moved "{card.title}" to {target.title}'
+
+    if kind == "delete_card":
+        card = _card(db, op.get("card_id"), user.id, board_id)
+        title = card.title
+        db.delete(card)
+        return f'Deleted "{title}"'
+
+    raise OperationRejected(f"unknown operation type {kind!r}")
+
+
+def apply_operations(db: Session, operations: list, user: User, board_id: int) -> tuple[list[str], list[str]]:
+    applied = []
+    skipped = []
+    for op in operations:
+        try:
+            msg = apply_operation(db, op, user, board_id)
+            applied.append(msg)
+        except OperationRejected as err:
+            skipped.append(str(err))
+    return applied, skipped</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 7
+    sections.append('''
+      <!-- SECTION 7 -->
+      <section id="section-7" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🔑 7. Complete Authentication & Session API Specifications</span>
+          <span class="badge-method post">AUTH API</span>
+        </div>
+
+        <p><span class="badge-method post">POST</span> <code>/api/auth/register</code></p>
+        <ul>
+          <li><strong>Description:</strong> Registers a new user, hashes password via PBKDF2, and creates a default seed board.</li>
+          <li><strong>Request Body:</strong> <code>{"username": "dev_user", "password": "PassWord123!"}</code></li>
+          <li><strong>Response (200 OK):</strong> <code>{"token": "tK9_xL3m...", "username": "dev_user"}</code></li>
+        </ul>
+
+        <p><span class="badge-method post">POST</span> <code>/api/auth/login</code></p>
+        <ul>
+          <li><strong>Description:</strong> Authenticates user credentials against PBKDF2 hash and generates a 32-byte session token.</li>
+          <li><strong>Response (200 OK):</strong> <code>{"token": "tK9_xL3m...", "username": "dev_user"}</code></li>
+        </ul>
+
+        <p><span class="badge-method get">GET</span> <code>/api/auth/me</code></p>
+        <ul>
+          <li><strong>Header:</strong> <code>Authorization: Bearer &lt;token&gt;</code></li>
+          <li><strong>Response (200 OK):</strong> <code>{"id": 1, "username": "dev_user"}</code></li>
+        </ul>
+
+        <h3>Python Security Module (<code>backend/app/security.py</code>)</h3>
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/security.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>import hashlib
+import os
+
+ITERATIONS = 600000
+
+
+def hash_password(password: str) -> str:
+    salt = os.urandom(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, ITERATIONS)
+    return f"{salt.hex()}:{dk.hex()}"
+
+
+def verify_password(password: str, hash_str: str) -> bool:
+    try:
+        salt_hex, dk_hex = hash_str.split(":", 1)
+        salt = bytes.fromhex(salt_hex)
+        expected_dk = bytes.fromhex(dk_hex)
+        dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, ITERATIONS)
+        return hashlib.compare_digest(dk, expected_dk)
+    except Exception:
+        return False</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 8
+    sections.append('''
+      <!-- SECTION 8 -->
+      <section id="section-8" class="doc-section searchable">
+        <div class="doc-title">
+          <span>📋 8. Board, Column & Card REST API Contracts</span>
+          <span class="badge-method get">CRUD API</span>
+        </div>
+
+        <p><span class="badge-method get">GET</span> <code>/api/boards/me</code> - Fetches user board with nested columns & cards</p>
+        <div class="code-box">
+          <div class="code-header"><span>GET /api/boards/me Response Payload</span><button class="copy-btn" onclick="copyCode(this)">Copy JSON</button></div>
+          <pre><code>{
+  "id": 1,
+  "title": "My Board",
+  "columns": [
+    {
+      "id": 1,
+      "title": "To Do",
+      "position": 0,
+      "cards": [
+        {
+          "id": 10,
+          "column_id": 1,
+          "title": "Implement OAuth",
+          "details": "Google provider integration",
+          "priority": "high",
+          "position": 0,
+          "created_at": "2026-10-10T12:00:00Z"
+        }
+      ]
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <p><span class="badge-method post">POST</span> <code>/api/cards/{card_id}/move</code> - Drag & drop move payload</p>
+        <div class="code-box">
+          <div class="code-header"><span>POST /api/cards/{card_id}/move Payload & Response</span><button class="copy-btn" onclick="copyCode(this)">Copy JSON</button></div>
+          <pre><code>// Request Body
+{ "column_id": 2, "position": 0 }
+
+// Response (200 OK)
+{ "id": 10, "column_id": 2, "position": 0, "title": "Implement OAuth", "priority": "high" }</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 9
+    sections.append('''
+      <!-- SECTION 9 -->
+      <section id="section-9" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🤖 9. 10-Tool AI Endpoint Suite & OpenRouter Integration</span>
+          <span class="badge-method post">AI SUITE</span>
+        </div>
+
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th>Tool Name</th>
+              <th>Endpoint Path</th>
+              <th>Input Schema</th>
+              <th>Output Payload / Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Natural Language Chat</strong></td>
+              <td><code>/api/ai/chat</code></td>
+              <td><code>{ board_id, message }</code></td>
+              <td>Text reply + JSON operations list (applied & skipped)</td>
+            </tr>
+            <tr>
+              <td><strong>Card Intelligence</strong></td>
+              <td><code>/api/ai/card-intelligence</code></td>
+              <td><code>{ board_id, card_id, task }</code></td>
+              <td>Acceptance criteria details, priority rating, or duplicates</td>
+            </tr>
+            <tr>
+              <td><strong>Workflow Optimizer</strong></td>
+              <td><code>/api/ai/workflow-optimization</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>Bottlenecks, next action recommendations & re-order mapping</td>
+            </tr>
+            <tr>
+              <td><strong>Daily Summary</strong></td>
+              <td><code>/api/ai/daily-summary</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>Executive markdown progress summary</td>
+            </tr>
+            <tr>
+              <td><strong>Sprint Retrospective</strong></td>
+              <td><code>/api/ai/sprint-retrospective</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>What went well, improvement areas, process items</td>
+            </tr>
+            <tr>
+              <td><strong>Risk Assessment</strong></td>
+              <td><code>/api/ai/risk-assessment</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>Identified task delivery risks and blockers</td>
+            </tr>
+            <tr>
+              <td><strong>Effort Estimation</strong></td>
+              <td><code>/api/ai/effort-estimation</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>S/M/L story point estimations per card</td>
+            </tr>
+            <tr>
+              <td><strong>Daily Standup</strong></td>
+              <td><code>/api/ai/standup</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>First-person standup bullets & team blockers</td>
+            </tr>
+            <tr>
+              <td><strong>Weekly Report</strong></td>
+              <td><code>/api/ai/weekly-report</code></td>
+              <td><code>{ board_id }</code></td>
+              <td>Categorized progress report (Done, In Progress, Up Next)</td>
+            </tr>
+            <tr>
+              <td><strong>Live AI Tech News</strong></td>
+              <td><code>/api/ai/news?randomize=true</code></td>
+              <td>None (GET)</td>
+              <td>Randomized tech news articles RSS feed</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+''')
+
+    # SECTION 10
+    sections.append('''
+      <!-- SECTION 10 -->
+      <section id="section-10" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🎨 10. Frontend React 19 & Next.js 15 Component Tree Architecture</span>
+          <span class="badge-method get">FRONTEND</span>
+        </div>
+
+        <div class="diagram-box">
+AppRoot Component Tree Hierarchy:
+─────────────────────────────────────────────────────────────────────────────
+AppRoot (Auth Gate & Shell Controller)
+ ├── LoginForm (Shown when bearer token is absent/invalid)
+ └── KanbanBoard (Main Drag-and-Drop Canvas)
+      ├── Header Bar & Navigation
+      │    ├── Title & Connection Status
+      │    ├── AI Analysis Toolbar (8 Header Modal Triggers)
+      │    └── User Profile & Logout Button
+      ├── Column Canvas (Horizontal Sortable Context)
+      │    └── KanbanColumn (Drop Container)
+      │         ├── Column Header & Card Badge
+      │         └── Sortable Context (Vertical Card List)
+      │              └── KanbanCard (Sortable Item)
+      │                   ├── Drag Handle
+      │                   ├── Title & Priority Badge
+      │                   └── [AI] Card Intelligence Action Trigger
+      ├── ChatSidebar Drawer (Floating Co-pilot Panel)
+      └── AI Modal Managers (AINewsPanel, WorkflowPanel, etc.)
+─────────────────────────────────────────────────────────────────────────────
+        </div>
+      </section>
+''')
+
+    # SECTION 11
+    sections.append('''
+      <!-- SECTION 11 -->
+      <section id="section-11" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🎯 11. @dnd-kit Engine Calibration & Collision Prevention</span>
+          <span class="badge-method patch">DRAG & DROP</span>
+        </div>
+
+        <ul>
+          <li><strong>Activation Constraint:</strong> <code>PointerSensor</code> initialized with <code>activationConstraint: { distance: 6 }</code> to ensure clicks on buttons or card titles don't trigger drag states.</li>
+          <li><strong>Prefix Namespacing:</strong> Column IDs prefixed with <code>c{id}</code> and Card IDs prefixed with <code>d{id}</code> to prevent collision in <code>@dnd-kit</code>'s global lookup registry.</li>
+          <li><strong>Optimistic State Mutators:</strong> Local React board state in <code>frontend/src/lib/kanban.ts</code> updates instantly on drag-end before sending HTTP move requests.</li>
+        </ul>
+      </section>
+''')
+
+    # SECTION 12
+    sections.append('''
+      <!-- SECTION 12 -->
+      <section id="section-12" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🔒 12. Authentication Security & Bearer Token Management</span>
+          <span class="badge-method post">SECURITY</span>
+        </div>
+
+        <p>
+          Session management uses cryptographically secure tokens. On user login, <code>secrets.token_urlsafe(32)</code> generates a token mapping to the user session in memory:
+        </p>
+
+        <div class="code-box">
+          <div class="code-header"><span>backend/app/sessions.py</span><button class="copy-btn" onclick="copyCode(this)">Copy Python Code</button></div>
+          <pre><code>import secrets
+from datetime import datetime, timezone
+
+_sessions: dict[str, int] = {}
+
+
+def create_session(user_id: int) -> str:
+    token = secrets.token_urlsafe(32)
+    _sessions[token] = user_id
+    return token
+
+
+def get_user_id(token: str) -> int | None:
+    return _sessions.get(token)
+
+
+def delete_session(token: str) -> None:
+    _sessions.pop(token, None)</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 13
+    sections.append('''
+      <!-- SECTION 13 -->
+      <section id="section-13" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🧪 13. Testing Architecture & Quality Assurance Suite</span>
+          <span class="badge-method get">TESTING</span>
+        </div>
+
+        <p>The system maintains 80%+ backend code coverage requirement alongside Vitest and Playwright test suites:</p>
+        <div class="code-box">
+          <div class="code-header"><span>Test Execution Commands</span><button class="copy-btn" onclick="copyCode(this)">Copy Test Commands</button></div>
+          <pre><code># 1. Run Pytest Suite with 80% Coverage Enforcement
+cd backend
+pytest
+
+# 2. Run Vitest Unit Tests
+cd frontend
+npm run test
+
+# 3. Run Playwright End-to-End Tests against containerized app on port 8000
+cd frontend
+npm run test:e2e</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 14
+    sections.append('''
+      <!-- SECTION 14 -->
+      <section id="section-14" class="doc-section searchable">
+        <div class="doc-title">
+          <span>📦 14. Docker Multi-Stage Build & Control Execution Scripts</span>
+          <span class="badge-method post">DEVOPS</span>
+        </div>
+
+        <h3>Multi-Stage Production Dockerfile</h3>
+        <div class="code-box">
+          <div class="code-header"><span>Dockerfile</span><button class="copy-btn" onclick="copyCode(this)">Copy Dockerfile</button></div>
+          <pre><code># Stage 1: Build Frontend Static Site
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Final FastAPI Production Server Image
+FROM python:3.11-slim
+WORKDIR /app
+COPY backend/pyproject.toml ./
+RUN pip install --no-cache-dir .
+COPY backend/app ./app
+COPY --from=frontend-builder /app/frontend/out /srv/static
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]</code></pre>
+        </div>
+      </section>
+''')
+
+    # SECTION 15
+    sections.append(r'''
+      <!-- SECTION 15 -->
+      <section id="section-15" class="doc-section searchable">
+        <div class="doc-title">
+          <span>📁 15. Repository Directory & Code File Matrix</span>
+          <span class="badge-method get">FILE MAP</span>
+        </div>
+
+        <div class="diagram-box">
+D:\code\claude\pm\
+├── Dockerfile                       # Multi-stage production container configuration
+├── docker-compose.yml               # Container orchestration spec
+├── scripts/                         # Control execution scripts
+│   ├── start.sh / start.ps1         # Container launch scripts
+│   ├── stop.sh / stop.ps1           # Teardown scripts
+│   └── test.sh / test.ps1           # Test suite runner scripts
+├── data/                            # Persistent database volume
+│   └── kanban.db                    # Embedded SQLite database file
+├── backend/                         # FastAPI Python Backend
+│   ├── app/
+│   │   ├── main.py                  # Entry point & static asset router
+│   │   ├── db.py                    # SQLite engine & connection pragma hooks
+│   │   ├── models.py                # SQLAlchemy ORM declarative models
+│   │   ├── schemas.py               # Pydantic v2 validation contracts
+│   │   ├── kanban.py                # Positional re-indexing domain logic
+│   │   ├── security.py              # PBKDF2 password hashing & token auth
+│   │   ├── api/                     # REST API Route Handlers
+│   │   └── services/                # OpenRouter AI & Board Operations Engine
+│   └── tests/                       # Pytest Test Suite (80%+ Coverage)
+└── frontend/                        # Next.js 15 React Frontend
+    ├── package.json                 # Dependencies & scripts
+    ├── next.config.ts               # Static export configuration (`output: 'export'`)
+    └── src/
+        ├── app/                     # Next.js App Router root layout
+        ├── components/              # UI components (Board, Columns, Cards, AI Panels)
+        └── lib/                     # API client & local optimistic mutators
+        </div>
+      </section>
+''')
+
+    # SECTION 16
+    sections.append('''
+      <!-- SECTION 16 -->
+      <section id="section-16" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🕹 16. Live Interactive API Sandbox Simulator</span>
+          <span class="badge-method post">SANDBOX</span>
+        </div>
+
+        <p>Simulate API endpoint payloads directly inside this documentation page:</p>
+
+        <div class="sandbox-container">
+          <div class="sandbox-row">
+            <select id="sandboxMethod" class="sandbox-select">
+              <option value="POST">POST</option>
+              <option value="GET">GET</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+            <input type="text" id="sandboxUrl" class="sandbox-input-text" value="/api/ai/chat">
+            <button class="sandbox-btn" onclick="runSandbox()">Execute Request</button>
+          </div>
+          <div class="code-box">
+            <pre id="sandboxOutput"><code>// Response output will appear here...
+Click "Execute Request" to test simulated API endpoint execution.</code></pre>
+          </div>
+        </div>
+      </section>
+''')
+
+    # SECTION 17
+    sections.append('''
+      <!-- SECTION 17 -->
+      <section id="section-17" class="doc-section searchable">
+        <div class="doc-title">
+          <span>🎮 17. Interactive Drag-and-Drop Board Playground</span>
+          <span class="badge-method post">PLAYGROUND</span>
+        </div>
+
+        <p>Try out live position re-indexing and card movements in this embedded client-side sandbox:</p>
+
+        <div class="playground-wrapper">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong>Live Interactive Kanban Canvas</strong>
+            <button class="sandbox-btn" onclick="addPlaygroundCard()" style="padding:0.3rem 0.8rem; font-size:0.8rem;">+ Add Task Card</button>
+          </div>
+
+          <div class="playground-columns" id="playgroundCanvas">
+            <div class="playground-column" data-col="1">
+              <div class="playground-column-header"><span>TO DO</span> <span class="badge" style="background:var(--navy-hover); padding:0.1rem 0.4rem; border-radius:4px;">2</span></div>
+              <div class="playground-card-list">
+                <div class="playground-card" draggable="true" ondragstart="drag(event)" id="card-1">
+                  <strong>Fix Authentication Bug</strong>
+                  <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Priority: High</div>
+                </div>
+                <div class="playground-card" draggable="true" ondragstart="drag(event)" id="card-2">
+                  <strong>Update Tailwind Config</strong>
+                  <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Priority: Low</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="playground-column" data-col="2">
+              <div class="playground-column-header"><span>IN PROGRESS</span> <span class="badge" style="background:var(--navy-hover); padding:0.1rem 0.4rem; border-radius:4px;">1</span></div>
+              <div class="playground-card-list">
+                <div class="playground-card" draggable="true" ondragstart="drag(event)" id="card-3">
+                  <strong>Refactor AI Chat Drawer</strong>
+                  <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Priority: Medium</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="playground-column" data-col="3">
+              <div class="playground-column-header"><span>DONE</span> <span class="badge" style="background:var(--navy-hover); padding:0.1rem 0.4rem; border-radius:4px;">1</span></div>
+              <div class="playground-card-list">
+                <div class="playground-card" draggable="true" ondragstart="drag(event)" id="card-4">
+                  <strong>Setup Pytest 80% Coverage</strong>
+                  <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Priority: High</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+''')
+
+    # SECTION 18
+    sections.append('''
+      <!-- SECTION 18 -->
+      <section id="section-18" class="doc-section searchable">
+        <div class="doc-title">
+          <span>💡 18. Troubleshooting, Diagnostics & Maintenance Playbook</span>
+          <span class="badge-method get">DIAGNOSTICS</span>
+        </div>
+
+        <div class="diag-box">
+          <h4>Select an Issue Scenario for Instant Diagnostics:</h4>
+          <div class="diag-btn-group">
+            <button class="diag-btn active" onclick="showDiag(1)">Database Locked</button>
+            <button class="diag-btn" onclick="showDiag(2)">OpenRouter 401 Error</button>
+            <button class="diag-btn" onclick="showDiag(3)">@dnd-kit Drag Jitter</button>
+            <button class="diag-btn" onclick="showDiag(4)">Docker Build Cache</button>
+          </div>
+
+          <div id="diagResult">
+            <p><strong>Database Locked ("database is locked"):</strong><br>
+            Occurs when SQLite write transactions collide across async tasks. Ensure all FastAPI route handlers use synchronous <code>def</code> execution so FastAPI dispatches them to worker threads in <code>anyio</code>.</p>
+          </div>
+        </div>
+      </section>
+''')
+
+    # FOOTER & JAVASCRIPT ENGINE (approx 400 lines)
+    sections.append('''
+    </main>
+  </div>
+
+  <div id="toast" class="toast-popup">Copied to clipboard!</div>
+
+  <script>
+    // Live Search Filter Across Document
+    document.getElementById('masterSearch').addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase().trim();
+      const sections = document.querySelectorAll('.searchable');
+
+      sections.forEach(sec => {
+        const txt = sec.innerText.toLowerCase();
+        if (txt.includes(q)) {
+          sec.style.display = 'block';
+        } else {
+          sec.style.display = 'none';
+        }
+      });
+    });
+
+    // Copy Code Helper
+    function copyCode(btn) {
+      const pre = btn.parentElement.nextElementSibling || btn.nextElementSibling;
+      const text = pre.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+      });
+    }
+
+    // Sandbox Simulator
+    function runSandbox() {
+      const method = document.getElementById('sandboxMethod').value;
+      const url = document.getElementById('sandboxUrl').value;
+      const out = document.getElementById('sandboxOutput');
+
+      let response = {};
+
+      if (url.includes('/api/auth/register')) {
+        response = { status: 200, data: { token: "demo_bearer_token_xyz123", username: "user" } };
+      } else if (url.includes('/api/ai/chat')) {
+        response = {
+          status: 200,
+          data: {
+            response: "I have added a high-priority bug fix card to the In Progress column.",
+            applied_operations: ['Added "Fix OAuth Callback" to In Progress'],
+            skipped_operations: []
+          }
+        };
+      } else if (url.includes('/api/boards/me')) {
+        response = {
+          status: 200,
+          data: {
+            id: 1,
+            title: "My Kanban Board",
+            columns: [
+              { id: 1, title: "To Do", position: 0, cards: [{ id: 10, title: "Align roadmap", position: 0 }] }
+            ]
+          }
+        };
+      } else {
+        response = { status: 200, method: method, endpoint: url, message: "Simulated API Execution Successful" };
+      }
+
+      out.innerText = JSON.stringify(response, null, 2);
+    }
+
+    // Diagnostics Switcher
+    function showDiag(id) {
+      document.querySelectorAll('.diag-btn').forEach((btn, idx) => {
+        if (idx === id - 1) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+
+      const res = document.getElementById('diagResult');
+      if (id === 1) {
+        res.innerHTML = '<p><strong>Database Locked ("database is locked"):</strong><br>Occurs when SQLite write transactions collide across async tasks. Ensure all FastAPI route handlers use synchronous <code>def</code> execution so FastAPI dispatches them to worker threads in <code>anyio</code>.</p>';
+      } else if (id === 2) {
+        res.innerHTML = '<p><strong>OpenRouter 401 Error ("OpenRouter rejected OPENROUTER_API_KEY"):</strong><br>Check that <code>OPENROUTER_API_KEY</code> is correctly set in your environment or <code>.env</code> file. Verify key balance on openrouter.ai.</p>';
+      } else if (id === 3) {
+        res.innerHTML = '<p><strong>@dnd-kit Drag Jitter:</strong><br>Ensure <code>PointerSensor</code> activation constraint is set to <code>6px</code> distance. Prefixes on column and card IDs prevent lookup registry collisions.</p>';
+      } else if (id === 4) {
+        res.innerHTML = '<p><strong>Docker Build Cache Invalidation:</strong><br>Copy <code>package*.json</code> and run <code>npm ci</code> before copying source files to leverage Docker layer caching efficiently.</p>';
+      }
+    }
+
+    // Scrollspy for Sidebar Navigation
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const sections = document.querySelectorAll('section');
+      sections.forEach(sec => {
+        if (pageYOffset >= sec.offsetTop - 120) {
+          current = sec.getAttribute('id');
+        }
+      });
+      document.querySelectorAll('.nav-item').forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+          link.classList.add('active');
+        }
+      });
+    });
+
+    // Drag and Drop Playground logic
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    document.querySelectorAll('.playground-column').forEach(col => {
+      col.addEventListener('dragover', e => e.preventDefault());
+      col.addEventListener('drop', e => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData("text");
+        const card = document.getElementById(data);
+        if (card) {
+          col.querySelector('.playground-card-list').appendChild(card);
+        }
+      });
+    });
+
+    let cardCounter = 5;
+    function addPlaygroundCard() {
+      const col = document.querySelector('.playground-column[data-col="1"] .playground-card-list');
+      const card = document.createElement('div');
+      card.className = 'playground-card';
+      card.draggable = true;
+      card.id = 'card-' + cardCounter++;
+      card.ondragstart = drag;
+      card.innerHTML = '<strong>New Task Card #' + cardCounter + '</strong><div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Priority: Medium</div>';
+      col.appendChild(card);
+    }
+  </script>
+</body>
+</html>
+''')
+
+    return "".join(sections)
+
+# Build content
+html_content = get_html_content()
+
+with open(output_path_1, "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+lines = html_content.split("\n")
+print(f"Successfully wrote clean, comprehensive guide ({len(lines)} lines) to {output_path_1}")
